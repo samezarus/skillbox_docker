@@ -1,0 +1,2 @@
+docker run --name nginx1 --publish 8081:80 -v /home/sameza/PROJECTS/docker/nginx/html/nginx1/:/usr/share/nginx/html:ro -d nginx
+docker run --name nginx2 --publish 8082:80 -v /home/sameza/PROJECTS/docker/nginx/html/nginx2/:/usr/share/nginx/html:ro -d nginx
