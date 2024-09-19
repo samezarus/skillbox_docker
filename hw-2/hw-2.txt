@@ -1,2 +1,49 @@
-docker run --name nginx1 --publish 8081:80 -v /home/sameza/PROJECTS/docker/nginx/html/nginx1/:/usr/share/nginx/html:ro -d nginx
-docker run --name nginx2 --publish 8082:80 -v /home/sameza/PROJECTS/docker/nginx/html/nginx2/:/usr/share/nginx/html:ro -d nginx
+Спеки контейнеров:
+
+docker run \
+--name nginx1 \
+--publish 8081:80 \
+-v /home/sameza/PROJECTS/docker/nginx/html/:/usr/share/nginx/html:ro \
+-d nginxext
+
+
+docker run \
+--name nginx2 \
+--publish 8082:80 \
+-v /home/sameza/PROJECTS/docker/nginx/html/:/usr/share/nginx/html:ro \
+--tmpfs /tmpbox \
+-d nginxext
+
+Краткое пояснение:
+
+Поднял чистый nginx, установил туда набор сетевых утелит для ping.
+Конвертнул данный контейнер в образ nginxext.
+Поднял два контейнера(nginx1, nginx2) из образа nginxext.
+Смапил по одному порту в каждый nginx1 8081->80, nginx2 8082->80
+Прокинул в них одby html-файл (index.html) посредством общего вольюма в виде папки (type=bind).
+При отключенной сети делал не apt update, а ping корневого DNS гугла (8.8.8.8), что бы всё вошло в один скрин.
+
+
+ps:
+
+2.6.6 - Создайте сетку, которая полностью отключит взаимодействие контейнеров с сетью:
+
+Если создать сеть без явного указания драйвера, то она по дефолту создаётся с драйвером bridge
+
+Я не могу создать сеть с драйакром null, т.к. 
+network create -d null offlan -> Error response from daemon: only one instance of "null" network is allowed
+
+Возможно нужно создать другой контекст и там пробовать это сделать ... тема в уроке вообще не раскрыта ...
+
+По это му воспользуюсь предустановленной в докере сетью none (драйвер null)
+
+2.6.15 - Зайдите на Gitlab, создайте новый проект с произвольным именем. 
+Вместе с проектом создастся новый git-репозиторий. 
+Выгрузите результат работы в созданный репозиторий, и 
+предоставьте доступ куратору с ролью Maintainer. 
+На проверку сдайте ссылку на созданный проект.
+
+Вот этот пункт вообще не понял ... Нужно залить архив в гит и потом в форму вставить линк на репу,
+или просто закинуть архив в форму ? ....
+
+В телеграм-канале сказали делать как удобнее ...
