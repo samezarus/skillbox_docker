@@ -1,0 +1,65 @@
+Создаём каталог:
+
+    sudo mkdir -p /opt/overlay_test
+
+Назначаем себе права на него:
+
+    sudo chown $USER /opt/overlay_test
+
+Создание обязательных подкаталогов:
+
+    lower + lower_plus_one + upper -> merget, work - для подготовки объединённго содержимого
+
+    mkdir /opt/overlay_test/lower
+    mkdir /opt/overlay_test/lower_plus_one
+    mkdir /opt/overlay_test/upper
+
+    mkdir /opt/overlay_test/merget
+    
+    mkdir /opt/overlay_test/work
+
+Для тестов зактнем по одному файлу в каталоги:
+
+    echo "lower!"          > /opt/overlay_test/lower/lower.txt
+    echo "lower_plus_one!" > /opt/overlay_test/lower_plus_one/lower_plus_one.txt
+    echo "upper!"          > /opt/overlay_test/upper/upper.txt
+
+ Проверяем что всё верно:
+
+    tree /opt/overlay_test
+
+    /opt/overlay_test
+    ├── lower
+    │   └── lower.txt
+    ├── lower_plus_one
+    │   └── lower_plus_one.txt
+    ├── merget
+    ├── upper
+    │   └── upper.txt
+    └── work
+
+Объединяем:
+
+    cd /opt/overlay_test
+
+    sudo mount -t overlay -o lowerdir=lower:lower_plus_one,upperdir=upper,workdir=work overlay merget
+
+ Проверяем что всё верно:
+
+    tree /opt/overlay_test
+
+    /opt/overlay_test
+    ├── lower
+    │   └── lower.txt
+    ├── lower_plus_one
+    │   └── lower_plus_one.txt
+    ├── merget
+    │   ├── lower.txt
+    │   ├── lower_plus_one.txt
+    │   └── upper.txt
+    ├── upper
+    │   └── upper.txt
+    └── work
+        └── work  [error opening dir]
+
+
