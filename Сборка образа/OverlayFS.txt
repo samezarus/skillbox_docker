@@ -1,0 +1,14 @@
+Создаём каталог:
+
+    sudo mkdir -p /opt/overlay_test
+
+Назначаем себе права на него:
+    sudo chown $USER /opt/overlay_test
+
+Создание обязательных подкаталогов:
+
+    mkdir /opt/overlay_test/lower
+    mkdir /opt/overlay_test/lower_plus_one
+    mkdir /opt/overlay_test/upper
+    mkdir /opt/overlay_test/work
+    mkdir /opt/overlay_test/merget

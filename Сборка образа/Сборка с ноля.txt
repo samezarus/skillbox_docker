@@ -12,26 +12,20 @@
     Назначаем себе права на него:
         sudo chown $USER /opt/proto_img
 
-    Переходим в каталог "/opt/proto_img":
-        cd /opt/proto_img
-
     Создаём каталог для непосредственно файловой системы образа:
-        mkdir fs
-
-    Переходим в каталог будующей файловой системы "/opt/proto_img/fs":
-        cd fs
+        mkdir /opt/proto_img/fs
     
 Ищем расположение переносимой программы:
 
     whereis bash -> /usr/bin/bash
 
-Найденный путь воссоздаём в каталоге "/opt/proto_img/fs":
+Воссоздаём путь в каталоге:
 
-    mkdir -p usr/bin
+    mkdir -p /opt/proto_img/fs/usr/bin
 
-Копируем программу в созданный каталог (/usr/bin/bash -> /opt/proto_img/fs/usr/bin):
+Копируем программу в созданный каталог:
 
-     cp /usr/bin/bash usr/bin
+     cp /usr/bin/bash /opt/proto_img/fs/usr/bin
 
 Ищем зависимости программы:
 
@@ -44,19 +38,19 @@
 
 Создание каталогов для зависимостей:
 
-    mkdir -p lib/x86_64-linux-gnu
-    mkdir -p lib64
+    mkdir -p /opt/proto_img/fs/lib/x86_64-linux-gnu
+    mkdir -p /opt/proto_img/fs/lib64
 
 Копирование зависимостей:
 
-    cp /lib/x86_64-linux-gnu/libtinfo.so.6 lib/x86_64-linux-gnu
-    cp /lib/x86_64-linux-gnu/libc.so.6 lib/x86_64-linux-gnu
+    cp /lib/x86_64-linux-gnu/libtinfo.so.6 /opt/proto_img/fs/lib/x86_64-linux-gnu
+    cp /lib/x86_64-linux-gnu/libc.so.6 /opt/proto_img/fs/lib/x86_64-linux-gnu
 
-    cp /lib64/ld-linux-x86-64.so.2 lib64
+    cp /lib64/ld-linux-x86-64.so.2 /opt/proto_img/fs/lib64
 
-Убеждаемся что всё соответствует в каталоге "/opt/proto_img/fs":
+Убеждаемся что всё соответствует:
 
-    tree ./
+    tree ./opt/proto_img/fs
 
     ./
     ├── lib
