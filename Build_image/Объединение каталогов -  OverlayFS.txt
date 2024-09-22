@@ -62,4 +62,12 @@
     └── work
         └── work  [error opening dir]
 
+Выводы:
 
+    | Docker          | OverlayFS |
+    | --------------- | --------- |
+    | container mount | merget    |
+    | container layer | upperdir  |
+    | image layer     | lowerdir  |
+
+    

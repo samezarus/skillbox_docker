@@ -1,0 +1,5 @@
+docker build ./ -t <имя образа> 
+
+docker image ls
+
+docker run --rm -it <имя/id образа>

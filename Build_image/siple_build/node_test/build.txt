@@ -1,0 +1,58 @@
+!!! Речь про запуск js-приложения со всеми зависимостями. Исключительно для тестов, т.к.
+в боевом режиме нужно билдить приложение, что бы избавиться от ненужных зависимосткй
+
+Установка nodejs на хост:
+
+    https://nodejs.org/en/download/package-manager:
+
+        # installs nvm (Node Version Manager)
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.0/install.sh | bash
+
+        # download and install Node.js (you may need to restart the terminal)
+        nvm install 20
+
+        # verifies the right Node.js version is in the environment
+        node -v # should print `v20.17.0`
+
+        # verifies the right npm version is in the environment
+        npm -v # should print `10.8.2`
+
+Создаём тестовое приложение в папку откуда планируется брать docker-контекст, т.е. где располагается Dockerfile:
+
+    npx create-react-app my-app
+
+Создаём Dockerfile:
+
+    > Dockerfile
+
+    FROM node:18.0.0-alpine
+
+    ENV NODE_ENV production
+
+    WORKDIR /usr/src/app
+
+    # Run the application as a non-root user.
+    USER node
+
+    # Copy the rest of the source files into the image.
+    COPY ["./my-app", "./"]
+
+    # Expose the port that the application listens on.
+    EXPOSE 3000
+
+    # Run the application.
+    ENTRYPOINT ["npm"]
+    CMD ["start"]
+
+Билдим образ:
+
+    docker build ./ -t node-test
+
+Сохдаём контейнер на основе ранее созданого образа (node-test)
+
+    docker run -d --rm  -p 8080:3000 --name node-test-cnt node-test
+
+Тест в броузере:
+
+    http://<ip хоста>:8080/
+
