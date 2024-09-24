@@ -142,3 +142,47 @@
 
 Docker Builder:
 
+Docker Trust:
+
+    Ключ для подписи образов
+
+Хранение:
+
+    Docker hub
+
+        Логин:
+            docker login -u sameza
+
+        Upload image:
+
+            https://docs.docker.com/get-started/workshop/04_sharing_app/
+
+            docker tag getting-started YOUR-USER-NAME/getting-started:latest
+            docker push YOUR-USER-NAME/getting-started:latest
+
+            
+
+    Docker Regestry:
+
+        https://hub.docker.com/_/registry
+
+        Представлен в виде контейнера и служит локальным аналогом Docker hub
+
+        Запуск контейнера:
+            docker run -d -p 5000:5000 --restart always --name registry registry:2
+
+        Если надо качаем кандитата:
+            docker pull <образ с docker hub>
+
+        Если надо, то переименовываем образ в своё имя:
+            docker tag <образ с docker hub> localhost:5000/<новый тэг>
+        
+        Пушим образ в локальный registry:
+            docker push localhost:5000/<новый тэг>
+
+        Список образов в registry:
+            curl http://localhost:5000/v2/_catalog
+
+    RedHat Quey
+
+    Harbor
