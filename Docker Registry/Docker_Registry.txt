@@ -1,0 +1,39 @@
+Mans:
+    
+    https://hub.docker.com/_/registry 
+
+    https://docs.docker.com/registry/
+
+    https://distribution.github.io/distribution/
+
+База:
+
+    Старт:
+
+        docker run -d -p 5000:5000 --name registry registry:2
+
+    Стянуть или создать свой образ:
+
+        К примеру стянуть - docker pull ubuntu
+
+    Протегировать(создать с новым именем) ранее стянутый/созданый образ:
+
+        docker image tag ubuntu localhost:5000/my-ubuntu
+
+    Отправить ранее протегированый образ в registry:
+        
+        docker push localhost:5000/my-ubuntu
+
+        и удаляем локальный образ с хоста - docker image remove localhost:5000/my-ubuntu
+
+    Стягивание образа из registry:
+        
+        docker pull localhost:5000/my-ubuntu
+
+    Просмотр содержимого registry:
+
+        curl http://localhost:5000/v2/_catalog
+
+    Удаление registry с хоста:
+
+        docker container stop registry && docker container rm -v registry

@@ -1,0 +1,2395 @@
+<!DOCTYPE html>
+<html
+  lang="en"
+  class="color-toggle-hidden"
+  
+>
+  <head>
+    <meta charset="UTF-8" />
+<meta name="referrer" content="no-referrer" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="color-scheme" content="light dark" />
+<meta name="generator" content="Hugo 0.119.0">
+
+
+  <meta name="description" content="Explains how to deploy a registry" />
+  <meta name="keywords" content="registry,,on-prem,,images,,tags,,repository,,distribution,,deployment" />
+
+    <title>Deploy a registry server | CNCF Distribution</title>
+
+    <link rel="icon" type="image/svg+xml" href="../../favicon/favicon.svg" />
+<link
+  rel="icon"
+  type="image/png"
+  sizes="32x32"
+  href="../../favicon/favicon-32x32.png"
+/>
+<link
+  rel="icon"
+  type="image/png"
+  sizes="16x16"
+  href="../../favicon/favicon-16x16.png"
+/>
+
+    
+
+    
+  <meta
+    property="og:title"
+    content="Deploy a registry server"
+  />
+  <meta property="og:site_name" content="CNCF Distribution" />
+  <meta property="og:description" content="Explains how to deploy a registry" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://distribution.github.io/distribution/about/deploying/" />
+
+<meta property="article:section" content="About" />
+
+
+  <meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="Deploy a registry server" />
+  <meta name="twitter:description" content="Explains how to deploy a registry" />
+
+
+  <script type="application/ld+json">
+  {
+      "@context": "http://schema.org",
+      "@type": "TechArticle",
+      "articleSection": "About",
+      "name": "Deploy a registry server",
+      "url" : "https://distribution.github.io/distribution/about/deploying/",
+      "headline": "Deploy a registry server",
+      "description": "Explains how to deploy a registry",
+      "wordCount" : "2786",
+      "license": "CC BY 4.0",
+      "inLanguage": "en",
+      "isFamilyFriendly": "true",
+      "mainEntityOfPage": {
+          "@type": "WebPage",
+          "@id": "https://distribution.github.io/distribution/about/deploying/"
+      },
+      "copyrightHolder" : "CNCF Distribution",
+      "copyrightYear" : "0001",
+      "dateCreated": "0001-01-01T00:00:00.00Z",
+      "datePublished": "0001-01-01T00:00:00.00Z",
+      "dateModified": "0001-01-01T00:00:00.00Z",
+      "publisher":{
+          "@type":"Organization",
+          "name": "CNCF Distribution",
+          "url": "https://distribution.github.io/distribution",
+          "logo": {
+              "@type": "ImageObject",
+              "url": "https://distribution.github.io/distribution/brand.svg",
+              "width":"32",
+              "height":"32"
+          }
+      }
+  }
+  </script>
+
+
+    
+  <script src="../../js/colortheme-d3e4d351.bundle.min.js"></script>
+<script src="../../js/main-924a1933.bundle.min.js"></script>
+
+<link
+  rel="preload"
+  as="font"
+  href="../../fonts/Metropolis.woff2"
+  type="font/woff2"
+  crossorigin="anonymous"
+/>
+<link
+  rel="preload"
+  as="font"
+  href="../../fonts/LiberationSans.woff2"
+  type="font/woff2"
+  crossorigin="anonymous"
+/>
+
+<link
+  rel="preload"
+  href="../../main-252d384c.min.css"
+  as="style"
+/>
+<link
+  rel="stylesheet"
+  href="../../main-252d384c.min.css"
+  media="all"
+/>
+
+<link
+  rel="preload"
+  href="../../mobile-79ddc617.min.css"
+  as="style"
+/>
+<link
+  rel="stylesheet"
+  href="../../mobile-79ddc617.min.css"
+  media="screen and (max-width: 45rem)"
+/>
+
+<link
+  rel="preload"
+  href="../../print-735ccc12.min.css"
+  as="style"
+/>
+<link
+  rel="stylesheet"
+  href="../../print-735ccc12.min.css"
+  media="print"
+/>
+
+<link
+  rel="preload"
+  href="../../custom.css"
+  as="style"
+/>
+<link
+  rel="stylesheet"
+  href="../../custom.css"
+  media="all"
+/>
+  <link href="index.html" rel="canonical" type="text/html" />
+
+<!-- Made with Geekdoc theme https://github.com/thegeeklab/hugo-geekdoc -->
+
+    
+
+  </head>
+
+  <body itemscope itemtype="https://schema.org/WebPage">
+    
+  <!-- geekdoc include: sprites/geekdoc.svg -->
+  <svg class="svg-sprite" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><defs><svg viewBox="-7.27 -7.27 38.55 38.55" id="gdoc_arrow_back" xmlns="http://www.w3.org/2000/svg"><path d="M24 10.526v2.947H5.755l8.351 8.421-2.105 2.105-12-12 12-12 2.105 2.105-8.351 8.421H24z"/></svg><svg viewBox="-7.27 -7.27 38.55 38.55" id="gdoc_arrow_left_alt" xmlns="http://www.w3.org/2000/svg"><path d="M5.965 10.526V6.035L0 12l5.965 5.965v-4.491H24v-2.947H5.965z"/></svg><svg viewBox="-7.27 -7.27 38.55 38.55" id="gdoc_arrow_right_alt" xmlns="http://www.w3.org/2000/svg"><path d="M18.035 10.526V6.035L24 12l-5.965 5.965v-4.491H0v-2.947h18.035z"/></svg><svg viewBox="-7.27 -7.27 42.55 42.55" id="gdoc_bitbucket" xmlns="http://www.w3.org/2000/svg"><path d="M15.905 13.355c.189 1.444-1.564 2.578-2.784 1.839-1.375-.602-1.375-2.784-.034-3.403 1.151-.705 2.818.223 2.818 1.564zm1.907-.361c-.309-2.44-3.076-4.056-5.328-3.042-1.426.636-2.389 2.148-2.32 3.747.086 2.097 2.08 3.815 4.176 3.626s3.729-2.234 3.472-4.331zm4.108-9.315c-.756-.997-2.045-1.169-3.179-1.358-3.214-.516-6.513-.533-9.727.034-1.066.172-2.269.361-2.939 1.323 1.1 1.031 2.664 1.186 4.073 1.358 2.544.327 5.156.344 7.699.017 1.426-.172 3.008-.309 4.073-1.375zm.979 17.788c-.481 1.684-.206 3.953-1.994 4.932-3.076 1.701-6.806 1.89-10.191 1.289-1.787-.327-3.884-.894-4.864-2.578-.43-1.65-.705-3.334-.98-5.018l.103-.275.309-.155c5.121 3.386 12.288 3.386 17.427 0 .808.241.206 1.22.189 1.805zM26.01 4.951c-.584 3.764-1.255 7.51-1.908 11.257-.189 1.1-1.255 1.719-2.148 2.183-3.214 1.615-6.96 1.89-10.483 1.512-2.389-.258-4.829-.894-6.771-2.389-.911-.705-.911-1.908-1.083-2.922-.602-3.523-1.289-7.046-1.719-10.604.206-1.547 1.942-2.217 3.231-2.698C6.848.654 8.686.362 10.508.19c3.884-.378 7.854-.241 11.618.859 1.341.395 2.784.945 3.695 2.097.412.533.275 1.203.189 1.805z"/></svg><svg viewBox="-7.27 -7.27 38.55 38.55" id="gdoc_bookmark" xmlns="http://www.w3.org/2000/svg"><path d="M15.268 4.392q.868 0 1.532.638t.664 1.506v17.463l-7.659-3.268-7.608 3.268V6.536q0-.868.664-1.506t1.532-.638h10.876zm4.34 14.144V4.392q0-.868-.638-1.532t-1.506-.664H6.537q0-.868.664-1.532T8.733 0h10.876q.868 0 1.532.664t.664 1.532v17.412z"/></svg><svg viewBox="-7.27 -7.27 42.55 42.55" id="gdoc_brightness_auto" xmlns="http://www.w3.org/2000/svg"><path d="M16.846 18.938h2.382L15.22 7.785h-2.44L8.772 18.938h2.382l.871-2.44h3.95zm7.087-9.062L27.999 14l-4.066 4.124v5.809h-5.809L14 27.999l-4.124-4.066H4.067v-5.809L.001 14l4.066-4.124V4.067h5.809L14 .001l4.124 4.066h5.809v5.809zm-11.385 4.937L14 10.282l1.452 4.531h-2.904z"/></svg><svg viewBox="-7.27 -7.27 42.55 42.55" id="gdoc_brightness_dark" xmlns="http://www.w3.org/2000/svg"><path d="M14 21.435q3.079 0 5.257-2.178T21.435 14t-2.178-5.257T14 6.565q-1.51 0-3.079.697 1.917.871 3.108 2.701T15.22 14t-1.191 4.037-3.108 2.701q1.568.697 3.079.697zm9.933-11.559L27.999 14l-4.066 4.124v5.809h-5.809L14 27.999l-4.124-4.066H4.067v-5.809L.001 14l4.066-4.124V4.067h5.809L14 .001l4.124 4.066h5.809v5.809z"/></svg><svg viewBox="-7.27 -7.27 42.55 42.55" id="gdoc_brightness_light" xmlns="http://www.w3.org/2000/svg"><path d="M14 21.435q3.079 0 5.257-2.178T21.435 14t-2.178-5.257T14 6.565 8.743 8.743 6.565 14t2.178 5.257T14 21.435zm9.933-3.311v5.809h-5.809L14 27.999l-4.124-4.066H4.067v-5.809L.001 14l4.066-4.124V4.067h5.809L14 .001l4.124 4.066h5.809v5.809L27.999 14z"/></svg><svg viewBox="-7.27 -7.27 42.55 42.55" id="gdoc_check" xmlns="http://www.w3.org/2000/svg"><path d="M8.885 20.197 25.759 3.323l2.24 2.24L8.885 24.677 0 15.792l2.24-2.24z"/></svg><svg viewBox="-7.27 -7.27 42.55 42.55" id="gdoc_check_circle_outline" xmlns="http://www.w3.org/2000/svg"><path d="M14 25.239q4.601 0 7.92-3.319T25.239 14 21.92 6.08 14 2.761 6.08 6.08 2.761 14t3.319 7.92T14 25.239zM14 0q5.784 0 9.892 4.108T28 14t-4.108 9.892T14 28t-9.892-4.108T0 14t4.108-9.892T14 0zm6.441 7.822 1.972 1.972-11.239 11.239L4.207 14l1.972-1.972 4.995 4.995z"/></svg><svg viewBox="-7.27 -7.27 42.55 42.55" id="gdoc_cloud_off" xmlns="http://www.w3.org/2000/svg"><path d="M9.023 10.5H7q-1.914 0-3.281 1.395t-1.367 3.309 1.367 3.281T7 19.852h11.375zM3.5 4.976l1.477-1.477L24.5 23.022l-1.477 1.477-2.352-2.297H6.999q-2.898 0-4.949-2.051t-2.051-4.949q0-2.844 1.969-4.867t4.758-2.133zm19.086 5.578q2.242.164 3.828 1.832T28 16.351q0 3.008-2.461 4.758l-1.695-1.695q1.805-.984 1.805-3.063 0-1.422-1.039-2.461t-2.461-1.039h-1.75v-.602q0-2.68-1.859-4.539t-4.539-1.859q-1.531 0-2.953.711l-1.75-1.695Q11.431 3.5 14.001 3.5q2.953 0 5.496 2.078t3.09 4.977z"/></svg><svg viewBox="-7.27 -7.27 42.55 42.55" id="gdoc_code" xmlns="http://www.w3.org/2000/svg"><path d="M9.917 24.5a1.75 1.75 0 1 0-3.501.001 1.75 1.75 0 0 0 3.501-.001zm0-21a1.75 1.75 0 1 0-3.501.001A1.75 1.75 0 0 0 9.917 3.5zm11.666 2.333a1.75 1.75 0 1 0-3.501.001 1.75 1.75 0 0 0 3.501-.001zm1.75 0a3.502 3.502 0 0 1-1.75 3.026c-.055 6.581-4.721 8.039-7.82 9.023-2.898.911-3.846 1.349-3.846 3.117v.474a3.502 3.502 0 0 1 1.75 3.026c0 1.932-1.568 3.5-3.5 3.5s-3.5-1.568-3.5-3.5c0-1.294.711-2.424 1.75-3.026V6.526A3.502 3.502 0 0 1 4.667 3.5c0-1.932 1.568-3.5 3.5-3.5s3.5 1.568 3.5 3.5a3.502 3.502 0 0 1-1.75 3.026v9.06c.93-.456 1.914-.766 2.807-1.039 3.391-1.075 5.323-1.878 5.359-5.687a3.502 3.502 0 0 1-1.75-3.026c0-1.932 1.568-3.5 3.5-3.5s3.5 1.568 3.5 3.5z"/></svg><svg viewBox="-7.27 -7.27 42.55 42.55" id="gdoc_copy" xmlns="http://www.w3.org/2000/svg"><path d="M23.502 25.438V7.626H9.562v17.812h13.94zm0-20.315q1.013 0 1.787.745t.774 1.757v17.812q0 1.013-.774 1.787t-1.787.774H9.562q-1.013 0-1.787-.774t-.774-1.787V7.625q0-1.013.774-1.757t1.787-.745h13.94zM19.689 0v2.562H4.438v17.812H1.936V2.562q0-1.013.745-1.787T4.438.001h15.251z"/></svg><svg viewBox="-7.27 -7.27 42.55 42.55" id="gdoc_dangerous" xmlns="http://www.w3.org/2000/svg"><path d="M21.802 19.833 15.969 14l5.833-5.833-1.969-1.969L14 12.031 8.167 6.198 6.198 8.167 12.031 14l-5.833 5.833 1.969 1.969L14 15.969l5.833 5.833zM19.833 0 28 8.167v11.666L19.833 28H8.167L0 19.833V8.167L8.167 0h11.666z"/></svg><svg viewBox="-7.27 -7.27 46.55 46.55" id="gdoc_date" xmlns="http://www.w3.org/2000/svg"><path d="M27.192 28.844V11.192H4.808v17.652h22.384zm0-25.689q1.277 0 2.253.976t.976 2.253v22.459q0 1.277-.976 2.216t-2.253.939H4.808q-1.352 0-2.291-.901t-.939-2.253V6.385q0-1.277.939-2.253t2.291-.976h1.577V.001h3.23v3.155h12.769V.001h3.23v3.155h1.577zm-3.155 11.267v3.155h-3.23v-3.155h3.23zm-6.46 0v3.155h-3.155v-3.155h3.155zm-6.384 0v3.155h-3.23v-3.155h3.23z"/></svg><svg viewBox="-7.27 -7.27 46.55 46.55" id="gdoc_download" xmlns="http://www.w3.org/2000/svg"><path d="M2.866 28.209h26.269v3.79H2.866v-3.79zm26.268-16.925L16 24.418 2.866 11.284h7.493V.001h11.283v11.283h7.493z"/></svg><svg viewBox="-7.27 -7.27 46.55 46.55" id="gdoc_email" xmlns="http://www.w3.org/2000/svg"><path d="M28.845 9.615v-3.23L16 14.422 3.155 6.385v3.23L16 17.577zm0-6.46q1.277 0 2.216.977T32 6.385v19.23q0 1.277-.939 2.253t-2.216.977H3.155q-1.277 0-2.216-.977T0 25.615V6.385q0-1.277.939-2.253t2.216-.977h25.69z"/></svg><svg viewBox="-7.27 -7.27 42.55 42.55" id="gdoc_error_outline" xmlns="http://www.w3.org/2000/svg"><path d="M14 25.239q4.601 0 7.92-3.319T25.239 14 21.92 6.08 14 2.761 6.08 6.08 2.761 14t3.319 7.92T14 25.239zM14 0q5.784 0 9.892 4.108T28 14t-4.108 9.892T14 28t-9.892-4.108T0 14t4.108-9.892T14 0zm-1.38 6.967h2.761v8.413H12.62V6.967zm0 11.239h2.761v2.826H12.62v-2.826z"/></svg><svg viewBox="-7.27 -7.27 42.55 42.55" id="gdoc_fire" xmlns="http://www.w3.org/2000/svg"><path d="M17.689 21.998q-.32.32-.8.576t-.864.384q-1.152.384-2.272.032t-1.888-.992q-.128-.128-.096-.256t.16-.192q1.216-.384 1.92-1.216t.96-1.792q.192-.896-.064-1.728t-.384-1.728q-.128-.704-.096-1.376t.288-1.312q0-.128.128-.128t.192.064q.384.832.992 1.472t1.28 1.216 1.216 1.248.672 1.568q.064.384.064.704.064.96-.32 1.92t-1.088 1.536zm3.84-10.944q-.768-.704-1.6-1.28t-1.6-1.344q-1.536-1.536-2.016-3.584t.16-4.16q.128-.32-.096-.544t-.544-.096q-.768.32-1.44.768t-1.312.896q-1.984 1.664-3.136 3.936T8.633 10.51t.8 5.088q0 .128.032.256t.032.256q0 .576-.512.832t-1.024-.192q-.128-.192-.192-.32-1.024-1.28-1.376-2.912t-.096-3.232q.064-.384-.288-.576t-.608.128q-1.28 1.664-1.856 3.68t-.448 4.064q0 .576.096 1.184t.288 1.184q.448 1.536 1.216 2.816 1.216 2.048 3.264 3.424t4.416 1.696q2.496.32 5.024-.256t4.448-2.304q1.408-1.344 2.208-3.104t.864-3.68-.704-3.712q-.064-.128-.096-.224t-.096-.224q-.576-1.088-1.28-1.984-.256-.384-.544-.704t-.672-.64z"/></svg><svg viewBox="-7.27 -7.27 42.55 42.55" id="gdoc_git" xmlns="http://www.w3.org/2000/svg"><path d="M27.472 12.753 15.247.529a1.803 1.803 0 0 0-2.55 0l-2.84 2.84 2.137 2.137a2.625 2.625 0 0 1 3.501 3.501l3.499 3.499a2.625 2.625 0 1 1-1.237 1.237l-3.499-3.499c-.083.04-.169.075-.257.106v7.3a2.626 2.626 0 1 1-1.75 0v-7.3a2.626 2.626 0 0 1-1.494-3.607L8.62 4.606l-8.09 8.09a1.805 1.805 0 0 0 0 2.551l12.225 12.224a1.803 1.803 0 0 0 2.55 0l12.168-12.168a1.805 1.805 0 0 0 0-2.551z"/></svg><svg viewBox="-7.27 -7.27 46.55 46.55" id="gdoc_gitea" xmlns="http://www.w3.org/2000/svg"><path d="M5.581 7.229c-2.46-.005-5.755 1.559-5.573 5.48.284 6.125 6.56 6.693 9.068 6.743.275 1.149 3.227 5.112 5.412 5.32h9.573c5.741-.381 10.04-17.363 6.853-17.427-5.271.248-8.395.373-11.073.395v5.3l-.835-.369-.005-4.928c-3.075-.001-5.781-.144-10.919-.397-.643-.004-1.539-.113-2.501-.116zm.348 2.166h.293c.349 3.14.917 4.976 2.067 7.781-2.933-.347-5.429-1.199-5.888-4.38-.237-1.647.563-3.365 3.528-3.401zm11.409 3.087c.2.003.404.04.596.128l.999.431-.716 1.305h-.007a.996.996 0 0 0-.321.053l.006-.002c-.349.114-.593.406-.593.749 0 .097.019.189.055.275l-.002-.006a.767.767 0 0 0 .151.233l-.001-.001-1.235 2.248a.99.99 0 0 0-.302.052l.006-.002c-.349.114-.593.406-.593.749 0 .097.019.189.055.275l-.002-.006c.128.31.457.527.843.527a.987.987 0 0 0 .31-.049l-.006.002c.348-.114.592-.406.592-.749 0-.097-.02-.19-.056-.277l.002.006a.784.784 0 0 0-.211-.293l1.203-2.189a.999.999 0 0 0 .397-.041l-.006.002a.942.942 0 0 0 .285-.15l-.001.001c.464.195.844.353 1.117.488.411.203.556.337.6.487.044.147-.004.429-.236.925-.173.369-.46.893-.799 1.511h-.02a.991.991 0 0 0-.321.053l.006-.002c-.349.114-.593.406-.593.749 0 .097.019.189.055.275l-.002-.006c.128.31.457.527.843.527a.987.987 0 0 0 .31-.049l-.006.002c.348-.114.592-.406.592-.749a.703.703 0 0 0-.055-.275l.002.006a.802.802 0 0 0-.183-.27l.001.001c.335-.611.623-1.136.808-1.531.251-.536.381-.935.267-1.32s-.467-.636-.933-.867c-.307-.151-.689-.311-1.147-.503a.723.723 0 0 0-.052-.324l.002.006a.792.792 0 0 0-.194-.279l.704-1.284 3.899 1.684c.704.305.995 1.053.653 1.68l-2.68 4.907c-.343.625-1.184.884-1.888.58l-5.516-2.384c-.704-.304-.996-1.053-.653-1.68l2.68-4.905c.235-.431.707-.687 1.207-.707z"/></svg><svg viewBox="-7.27 -7.27 46.55 46.55" id="gdoc_github" xmlns="http://www.w3.org/2000/svg"><path d="M16 .394c8.833 0 15.999 7.166 15.999 15.999 0 7.062-4.583 13.062-10.937 15.187-.813.146-1.104-.354-1.104-.771 0-.521.021-2.25.021-4.396 0-1.5-.5-2.458-1.083-2.958 3.562-.396 7.312-1.75 7.312-7.896 0-1.75-.625-3.167-1.646-4.291.167-.417.708-2.042-.167-4.25-1.333-.417-4.396 1.646-4.396 1.646a15.032 15.032 0 0 0-8 0S8.937 6.602 7.603 7.018c-.875 2.208-.333 3.833-.167 4.25-1.021 1.125-1.646 2.542-1.646 4.291 0 6.125 3.729 7.5 7.291 7.896-.458.417-.875 1.125-1.021 2.146-.917.417-3.25 1.125-4.646-1.333-.875-1.521-2.458-1.646-2.458-1.646-1.562-.021-.104.979-.104.979 1.042.479 1.771 2.333 1.771 2.333.938 2.854 5.396 1.896 5.396 1.896 0 1.333.021 2.583.021 2.979 0 .417-.292.917-1.104.771C4.582 29.455-.001 23.455-.001 16.393-.001 7.56 7.165.394 15.998.394zM6.063 23.372c.042-.083-.021-.187-.146-.25-.125-.042-.229-.021-.271.042-.042.083.021.187.146.25.104.062.229.042.271-.042zm.646.709c.083-.062.062-.208-.042-.333-.104-.104-.25-.146-.333-.062-.083.062-.062.208.042.333.104.104.25.146.333.062zm.625.937c.104-.083.104-.25 0-.396-.083-.146-.25-.208-.354-.125-.104.062-.104.229 0 .375s.271.208.354.146zm.875.875c.083-.083.042-.271-.083-.396-.146-.146-.333-.167-.417-.062-.104.083-.062.271.083.396.146.146.333.167.417.062zm1.187.521c.042-.125-.083-.271-.271-.333-.167-.042-.354.021-.396.146s.083.271.271.312c.167.062.354 0 .396-.125zm1.313.104c0-.146-.167-.25-.354-.229-.187 0-.333.104-.333.229 0 .146.146.25.354.229.187 0 .333-.104.333-.229zm1.208-.208c-.021-.125-.187-.208-.375-.187-.187.042-.312.167-.292.312.021.125.187.208.375.167s.312-.167.292-.292z"/></svg><svg viewBox="-7.27 -7.27 42.55 42.55" id="gdoc_gitlab" xmlns="http://www.w3.org/2000/svg"><path d="M1.629 11.034 14 26.888.442 17.048a1.09 1.09 0 0 1-.39-1.203l1.578-4.811zm7.217 0h10.309l-5.154 15.854zM5.753 1.475l3.093 9.559H1.63l3.093-9.559a.548.548 0 0 1 1.031 0zm20.618 9.559 1.578 4.811c.141.437-.016.922-.39 1.203l-13.558 9.84 12.371-15.854zm0 0h-7.216l3.093-9.559a.548.548 0 0 1 1.031 0z"/></svg><svg viewBox="-7.27 -7.27 46.55 46.55" id="gdoc_heart" xmlns="http://www.w3.org/2000/svg"><path d="M16 29.714a1.11 1.11 0 0 1-.786-.321L4.072 18.643c-.143-.125-4.071-3.714-4.071-8 0-5.232 3.196-8.357 8.535-8.357 3.125 0 6.053 2.464 7.464 3.857 1.411-1.393 4.339-3.857 7.464-3.857 5.339 0 8.535 3.125 8.535 8.357 0 4.286-3.928 7.875-4.089 8.035L16.785 29.392c-.214.214-.5.321-.786.321z"/></svg><svg viewBox="-7.27 -7.27 42.55 42.55" id="gdoc_home" xmlns="http://www.w3.org/2000/svg"><path d="M24.003 15.695v8.336c0 .608-.504 1.111-1.111 1.111h-6.669v-6.669h-4.446v6.669H5.108a1.119 1.119 0 0 1-1.111-1.111v-8.336c0-.035.017-.069.017-.104L14 7.359l9.986 8.232a.224.224 0 0 1 .017.104zm3.873-1.198-1.077 1.285a.578.578 0 0 1-.365.191h-.052a.547.547 0 0 1-.365-.122L14 5.831 1.983 15.851a.594.594 0 0 1-.417.122.578.578 0 0 1-.365-.191L.124 14.497a.57.57 0 0 1 .069-.781L12.679 3.314c.729-.608 1.91-.608 2.64 0l4.237 3.543V3.471c0-.313.243-.556.556-.556h3.334c.313 0 .556.243.556.556v7.085l3.803 3.161c.226.191.26.556.069.781z"/></svg><svg viewBox="-7.27 -7.27 42.55 42.55" id="gdoc_info_outline" xmlns="http://www.w3.org/2000/svg"><path d="M12.62 9.793V6.967h2.761v2.826H12.62zM14 25.239q4.601 0 7.92-3.319T25.239 14 21.92 6.08 14 2.761 6.08 6.08 2.761 14t3.319 7.92T14 25.239zM14 0q5.784 0 9.892 4.108T28 14t-4.108 9.892T14 28t-9.892-4.108T0 14t4.108-9.892T14 0zm-1.38 21.033V12.62h2.761v8.413H12.62z"/></svg><svg viewBox="-7.27 -7.27 42.55 42.55" id="gdoc_keyboard_arrow_down" xmlns="http://www.w3.org/2000/svg"><path d="M3.281 5.36 14 16.079 24.719 5.36 28 8.641l-14 14-14-14z"/></svg><svg viewBox="-7.27 -7.27 46.55 46.55" id="gdoc_keyboard_arrow_left" xmlns="http://www.w3.org/2000/svg"><path d="M25.875 28.25 22.125 32 6.126 16.001 22.125.002l3.75 3.75-12.25 12.25z"/></svg><svg viewBox="-7.27 -7.27 46.55 46.55" id="gdoc_keyboard_arrow_right" xmlns="http://www.w3.org/2000/svg"><path d="M6.125 28.25 18.375 16 6.125 3.75 9.875 0l15.999 15.999L9.875 31.998z"/></svg><svg viewBox="-7.27 -7.27 42.55 42.55" id="gdoc_keyboard_arrow_up" xmlns="http://www.w3.org/2000/svg"><path d="M24.719 22.64 14 11.921 3.281 22.64 0 19.359l14-14 14 14z"/></svg><svg viewBox="-7.27 -7.27 42.55 42.55" id="gdoc_language" xmlns="http://www.w3.org/2000/svg"><path d="M20.112 16.826h4.732q.394-1.84.394-2.826t-.394-2.826h-4.732q.197 1.38.197 2.826t-.197 2.826zm-2.497 7.756q1.643-.526 3.418-2.005t2.695-2.991h-4.141q-.657 2.629-1.972 4.995zm-.329-7.756q.197-1.38.197-2.826t-.197-2.826h-6.573q-.197 1.38-.197 2.826t.197 2.826h6.573zM14 25.173q1.84-2.695 2.695-5.587h-5.39q.854 2.892 2.695 5.587zM8.413 8.413q.789-2.826 1.972-4.995-1.643.526-3.451 2.005T4.272 8.414h4.141zM4.272 19.587q.854 1.512 2.662 2.991t3.451 2.005q-1.315-2.366-1.972-4.995H4.272zm-1.117-2.761h4.732Q7.69 15.446 7.69 14t.197-2.826H3.155q-.394 1.84-.394 2.826t.394 2.826zM14 2.826q-1.84 2.695-2.695 5.587h5.39Q15.841 5.521 14 2.826zm9.727 5.587q-.92-1.512-2.695-2.991t-3.418-2.005q1.183 2.169 1.972 4.995h4.141zM14 0q5.784 0 9.892 4.108T28 14t-4.108 9.892T14 28t-9.892-4.108T0 14t4.108-9.892T14 0z"/></svg><svg viewBox="-7.27 -7.27 46.55 46.55" id="gdoc_link" xmlns="http://www.w3.org/2000/svg"><path d="M24.037 7.963q3.305 0 5.634 2.366T32 16t-2.329 5.671-5.634 2.366h-6.46v-3.08h6.46q2.028 0 3.493-1.465t1.465-3.493-1.465-3.493-3.493-1.465h-6.46v-3.08h6.46zM9.615 17.578v-3.155h12.77v3.155H9.615zM3.005 16q0 2.028 1.465 3.493t3.493 1.465h6.46v3.08h-6.46q-3.305 0-5.634-2.366T0 16.001t2.329-5.671 5.634-2.366h6.46v3.08h-6.46q-2.028 0-3.493 1.465t-1.465 3.493z"/></svg><svg viewBox="-7.27 -7.27 46.55 46.55" id="gdoc_mastodon" xmlns="http://www.w3.org/2000/svg"><path d="M30.924 10.506c0-6.941-4.548-8.976-4.548-8.976C24.083.477 20.144.034 16.054.001h-.101C11.862.034 7.926.477 5.633 1.53c0 0-4.548 2.035-4.548 8.976 0 1.589-.031 3.491.02 5.505.165 6.79 1.245 13.479 7.522 15.14 2.893.765 5.379.927 7.38.816 3.629-.2 5.667-1.296 5.667-1.296l-.12-2.633s-2.593.817-5.505.719c-2.887-.099-5.932-.311-6.399-3.855a7.069 7.069 0 0 1-.064-.967v-.028.001s2.833.693 6.423.857c2.195.1 4.253-.129 6.344-.377 4.009-.479 7.5-2.949 7.939-5.207.689-3.553.633-8.676.633-8.676zm-5.366 8.945h-3.329v-8.159c0-1.72-.724-2.592-2.171-2.592-1.6 0-2.403 1.035-2.403 3.083v4.465h-3.311v-4.467c0-2.048-.803-3.083-2.403-3.083-1.447 0-2.171.873-2.171 2.592v8.159H6.441v-8.404c0-1.719.437-3.084 1.316-4.093.907-1.011 2.092-1.528 3.565-1.528 1.704 0 2.995.655 3.848 1.965l.828 1.391.829-1.391c.853-1.311 2.144-1.965 3.848-1.965 1.472 0 2.659.517 3.565 1.528.877 1.009 1.315 2.375 1.315 4.093z"/></svg><svg viewBox="-7.27 -7.27 46.55 46.55" id="gdoc_matrix" xmlns="http://www.w3.org/2000/svg"><path d="M.843.734v30.532H3.04v.733H0V0h3.04v.733zm9.391 9.68v1.543h.044a4.417 4.417 0 0 1 1.489-1.365c.577-.327 1.248-.487 2-.487.72 0 1.377.143 1.975.419.597.277 1.047.776 1.36 1.477.339-.499.8-.941 1.379-1.323.579-.383 1.267-.573 2.061-.573.604 0 1.163.075 1.68.223a3.34 3.34 0 0 1 1.324.707c.368.327.652.745.861 1.268.203.523.307 1.151.307 1.889v7.637h-3.132v-6.468c0-.381-.013-.745-.043-1.083a2.315 2.315 0 0 0-.246-.893l.006.013a1.484 1.484 0 0 0-.577-.593l-.007-.004c-.259-.147-.609-.221-1.047-.221-.443 0-.8.085-1.071.252-.267.166-.483.39-.635.656l-.005.009a2.558 2.558 0 0 0-.307.915l-.002.013a7.156 7.156 0 0 0-.08 1.044v6.359h-3.133v-6.4c0-.339-.005-.671-.024-1.003a2.772 2.772 0 0 0-.197-.936l.007.019a1.41 1.41 0 0 0-.548-.667l-.006-.003c-.259-.167-.635-.253-1.139-.253-.148 0-.345.032-.585.099-.24.068-.48.191-.707.376-.228.184-.425.449-.585.793-.16.345-.24.8-.24 1.36v6.621H7.279v-11.42zm20.923 20.852V.734H28.96V.001H32V32h-3.04v-.733z"/></svg><svg viewBox="-7.27 -7.27 46.55 46.55" id="gdoc_menu" xmlns="http://www.w3.org/2000/svg"><path d="M.001 5.334h31.998v3.583H.001V5.334zm0 12.416v-3.5h31.998v3.5H.001zm0 8.916v-3.583h31.998v3.583H.001z"/></svg><svg viewBox="-7.27 -7.27 42.55 42.55" id="gdoc_notification" xmlns="http://www.w3.org/2000/svg"><path d="m22.615 19.384 2.894 2.894v1.413H2.49v-1.413l2.894-2.894V12.25q0-3.365 1.716-5.856t4.745-3.231v-1.01q0-.875.606-1.514T13.999 0t1.548.639.606 1.514v1.01q3.029.74 4.745 3.231t1.716 5.856v7.134zM14 27.999q-1.211 0-2.053-.808t-.841-2.019h5.788q0 1.144-.875 1.986T14 27.999z"/></svg><svg viewBox="-7.27 -7.27 42.55 42.55" id="gdoc_path" xmlns="http://www.w3.org/2000/svg"><path d="M28 12.62h-9.793V8.414h-2.826v11.173h2.826v-4.206H28V26.62h-9.793v-4.206H12.62v-14H9.794v4.206H.001V1.381h9.793v4.206h8.413V1.381H28V12.62z"/></svg><svg viewBox="-7.27 -7.27 46.55 46.55" id="gdoc_person" xmlns="http://www.w3.org/2000/svg"><path d="M16 20.023q5.052 0 10.526 2.199t5.473 5.754v4.023H0v-4.023q0-3.555 5.473-5.754t10.526-2.199zM16 16q-3.275 0-5.614-2.339T8.047 8.047t2.339-5.661T16 0t5.614 2.386 2.339 5.661-2.339 5.614T16 16z"/></svg><svg viewBox="-7.27 -7.27 46.55 46.55" id="gdoc_search" xmlns="http://www.w3.org/2000/svg"><path d="M11.925 20.161q3.432 0 5.834-2.402t2.402-5.834-2.402-5.834-5.834-2.402-5.834 2.402-2.402 5.834 2.402 5.834 5.834 2.402zm10.981 0L32 29.255 29.255 32l-9.094-9.094v-1.458l-.515-.515q-3.26 2.831-7.721 2.831-4.976 0-8.45-3.432T.001 11.925t3.474-8.45 8.45-3.474 8.407 3.474 3.432 8.45q0 1.802-.858 4.075t-1.973 3.646l.515.515h1.458z"/></svg><svg viewBox="-7.27 -7.27 42.55 42.55" id="gdoc_shield" xmlns="http://www.w3.org/2000/svg"><path d="M22.167 15.166V3.5h-8.166v20.726c.93-.492 2.424-1.349 3.883-2.497 1.95-1.531 4.284-3.919 4.284-6.562zm3.499-13.999v14c0 7.674-10.737 12.523-11.192 12.724-.146.073-.31.109-.474.109s-.328-.036-.474-.109c-.456-.201-11.192-5.049-11.192-12.724v-14C2.334.529 2.863 0 3.501 0H24.5c.638 0 1.167.529 1.167 1.167z"/></svg><svg viewBox="-7.27 -7.27 42.55 42.55" id="gdoc_star" xmlns="http://www.w3.org/2000/svg"><path d="M14 22.052 5.324 27.31l2.3-9.859L0 10.813l10.056-.854L14 .692l3.944 9.267L28 10.813l-7.624 6.638 2.3 9.859z"/></svg><svg viewBox="-7.27 -7.27 42.55 42.55" id="gdoc_tag" xmlns="http://www.w3.org/2000/svg"><path d="M17.52 17.52v-7.041h-7.041v7.041h7.041zM28 10.479h-7.041v7.041H28v3.439h-7.041V28H17.52v-7.041h-7.041V28H7.04v-7.041H-.001V17.52H7.04v-7.041H-.001V7.04H7.04V-.001h3.439V7.04h7.041V-.001h3.439V7.04H28v3.439z"/></svg><svg viewBox="-7.27 -7.27 46.55 46.55" id="gdoc_timer" xmlns="http://www.w3.org/2000/svg"><path d="M16 29q4.428 0 7.536-3.143t3.107-7.571-3.107-7.536T16 7.643 8.464 10.75t-3.107 7.536 3.107 7.571T16 29zM26.714 9.786q1.214 1.571 2.107 4.036t.893 4.464q0 5.643-4 9.678T16 32t-9.714-4.036-4-9.678 4-9.678T16 4.572q1.929 0 4.464.929t4.107 2.143l2.143-2.214q1.143.929 2.143 2.143zM14.5 19.857v-9.143h3v9.143h-3zM20.571.001v3.071h-9.143V.001h9.143z"/></svg><svg viewBox="-7.27 -7.27 46.55 46.55" id="gdoc_xmpp" xmlns="http://www.w3.org/2000/svg"><path d="M31.995 4.237c-.449.175-1.12.433-1.936.745-1.544.591-2.328.891-2.924 1.093-.613.208-1.287.409-2.635.813-.911.272-1.672.495-2.212.651-.031.875 0 2.177-.292 3.635a21.837 21.837 0 0 1-2.016 5.765c-1.496 2.944-3.236 4.817-3.88 5.476-.056-.059-.112-.117-.168-.179-.707-.763-2.403-2.703-3.815-5.683-1.053-2.223-1.484-4.044-1.605-4.584-.356-1.589-.427-2.955-.427-4.117 0-.075-.036-.129-.101-.149-.721-.223-1.765-.519-2.887-.853-1.271-.379-2.193-.744-3.408-1.2-.493-.185-1.409-.547-2.217-.859C.723 4.499.113 4.236.041 4.236c-.005 0-.015 0-.023.012a.131.131 0 0 0-.019.076c.009.593.08 1.361.256 2.365.615 3.503 2.688 7.061 4.36 9.244 0 0 3.717 5.035 9.128 8.144l.303.176c-.009.008-.02.015-.028.021-1.717 1.316-3.201 1.977-3.579 2.14a15.71 15.71 0 0 1-2.219.772v.407a25.31 25.31 0 0 0 2.72-.487 26.72 26.72 0 0 0 5.075-1.792c.136.067.276.136.42.204 1.527.725 3.571 1.627 6.073 2.048.613.103 1.136.165 1.507.195a.109.109 0 0 0 .115-.091.55.55 0 0 0 .004-.217.107.107 0 0 0-.063-.073c-.505-.209-1.201-.4-1.983-.719-.935-.381-2.241-1.067-3.648-2.128a13.528 13.528 0 0 1-.367-.287c4.64-2.656 7.989-6.588 7.989-6.588 1.735-2.036 4.441-5.623 5.431-9.795.349-1.473.539-2.741.5-3.628z"/></svg></defs></svg>
+
+
+
+
+    <div
+      class="wrapper "
+    >
+      <input type="checkbox" class="hidden" id="menu-control" />
+      <input type="checkbox" class="hidden" id="menu-header-control" />
+      
+      <header class="gdoc-header">
+  <div class="container flex align-center justify-between">
+    
+      <label for="menu-control" class="gdoc-nav__control" tabindex="0">
+        <svg class="gdoc-icon gdoc_menu">
+          <title>Open Navigation</title>
+          <use xlink:href="#gdoc_menu"></use>
+        </svg>
+        <svg class="gdoc-icon gdoc_arrow_back">
+          <title>Close Navigation</title>
+          <use xlink:href="#gdoc_arrow_back"></use>
+        </svg>
+      </label>
+    
+    <div>
+      <a class="gdoc-brand gdoc-header__link" href="../../../distribution.html">
+        <span class="flex align-center">
+          <img
+            class="gdoc-brand__img"
+            src="../../brand.svg"
+            alt=""
+          />
+          <span class="gdoc-brand__title">CNCF Distribution</span>
+        </span>
+      </a>
+    </div>
+    <div class="gdoc-menu-header">
+      <span class="gdoc-menu-header__items">
+        
+          
+
+  
+  
+  
+  
+
+  
+    
+      
+      
+      
+
+      
+      
+
+      
+
+      
+        <span>
+          <a
+            href="
+              https://github.com/distribution/distribution/
+            "
+            class="gdoc-header__link"
+          >
+            <svg class="gdoc-icon gdoc_github">
+              <title>GitHub</title>
+              <use xlink:href="#gdoc_github"></use>
+            </svg>
+          </a>
+        </span>
+      
+    
+  
+
+
+
+
+
+
+        
+
+
+        <span id="gdoc-color-theme">
+          <svg class="gdoc-icon gdoc_brightness_dark">
+            <title>Toggle Dark/Light/Auto mode</title>
+            <use xlink:href="#gdoc_brightness_dark"></use>
+          </svg>
+          <svg class="gdoc-icon gdoc_brightness_light">
+            <title>Toggle Dark/Light/Auto mode</title>
+            <use xlink:href="#gdoc_brightness_light"></use>
+          </svg>
+          <svg class="gdoc-icon gdoc_brightness_auto">
+            <title>Toggle Dark/Light/Auto mode</title>
+            <use xlink:href="#gdoc_brightness_auto"></use>
+          </svg>
+        </span>
+
+        <span class="gdoc-menu-header__home">
+          <a href="../../../distribution.html" class="gdoc-header__link">
+            <svg class="gdoc-icon gdoc_home">
+              <title>Back to homepage</title>
+              <use xlink:href="#gdoc_home"></use>
+            </svg>
+          </a>
+        </span>
+
+        
+
+
+
+        <span class="gdoc-menu-header__control">
+          <label for="menu-header-control">
+            <svg class="gdoc-icon gdoc_keyboard_arrow_right">
+              <use xlink:href="#gdoc_keyboard_arrow_right"></use>
+              <title>Close Menu Bar</title>
+            </svg>
+          </label>
+        </span>
+      </span>
+      <label for="menu-header-control" class="gdoc-menu-header__control">
+        <svg class="gdoc-icon gdoc_keyboard_arrow_left">
+          <use xlink:href="#gdoc_keyboard_arrow_left"></use>
+          <title>Open Menu Bar</title>
+        </svg>
+      </label>
+    </div>
+  </div>
+</header>
+
+
+
+      <main class="container flex flex-even">
+        
+          <aside class="gdoc-nav">
+            <nav>
+  
+  <div class="gdoc-search flex align-center">
+    <svg class="gdoc-icon gdoc_search"><use xlink:href="#gdoc_search"></use></svg>
+    <input
+      type="text"
+      id="gdoc-search-input"
+      class="gdoc-search__input"
+      placeholder="Search..."
+      aria-label="Search"
+      maxlength="64"
+      data-site-base-url="https://distribution.github.io/distribution"
+      data-site-lang="en"
+    />
+    <ul id="gdoc-search-results" class="gdoc-search__list"></ul>
+  </div>
+
+
+
+
+  <section class="gdoc-nav--main">
+    <h2>Navigation</h2>
+    
+      
+
+  
+
+
+  <ul class="gdoc-nav__list">
+    
+    
+      
+
+      
+        
+      
+
+      
+        
+          
+          
+          
+          
+          
+          
+
+
+          <li>
+            <input
+              type="checkbox"
+              
+                class="hidden"
+              
+            />
+            <label
+              
+            >
+              
+                <span class="flex">
+                  <a
+                    href="../index.html"
+                    class="gdoc-nav__entry"
+                  >
+                    About Registry
+                  </a>
+                </span>
+              
+              
+            </label>
+
+            
+              
+  
+
+
+  <ul class="gdoc-nav__list">
+    
+    
+      
+
+      
+        
+      
+
+      
+        
+          
+          
+          
+          
+          
+          
+
+
+          <li>
+            <input
+              type="checkbox"
+              
+                class="hidden"
+              
+            />
+            <label
+              
+            >
+              
+                <span class="flex">
+                  <a
+                    href="../configuration/index.html"
+                    class="gdoc-nav__entry"
+                  >
+                    Configuring a registry
+                  </a>
+                </span>
+              
+              
+            </label>
+
+            
+          </li>
+        
+      
+        
+          
+          
+          
+          
+          
+          
+
+
+          <li>
+            <input
+              type="checkbox"
+              
+                class="hidden"
+              
+            />
+            <label
+              
+            >
+              
+                <span class="flex">
+                  <a
+                    href="index.html"
+                    class="gdoc-nav__entry is-active"
+                  >
+                    Deploy a registry server
+                  </a>
+                </span>
+              
+              
+            </label>
+
+            
+          </li>
+        
+      
+        
+          
+          
+          
+          
+          
+          
+
+
+          <li>
+            <input
+              type="checkbox"
+              
+                class="hidden"
+              
+            />
+            <label
+              
+            >
+              
+                <span class="flex">
+                  <a
+                    href="../garbage-collection/index.html"
+                    class="gdoc-nav__entry"
+                  >
+                    Garbage collection
+                  </a>
+                </span>
+              
+              
+            </label>
+
+            
+          </li>
+        
+      
+        
+          
+          
+          
+          
+          
+          
+
+
+          <li>
+            <input
+              type="checkbox"
+              
+                class="hidden"
+              
+            />
+            <label
+              
+            >
+              
+                <span class="flex">
+                  <a
+                    href="../help/index.html"
+                    class="gdoc-nav__entry"
+                  >
+                    Get help
+                  </a>
+                </span>
+              
+              
+            </label>
+
+            
+          </li>
+        
+      
+        
+          
+          
+          
+          
+          
+          
+
+
+          <li>
+            <input
+              type="checkbox"
+              
+                class="hidden"
+              
+            />
+            <label
+              
+            >
+              
+                <span class="flex">
+                  <a
+                    href="../compatibility/index.html"
+                    class="gdoc-nav__entry"
+                  >
+                    Registry compatibility
+                  </a>
+                </span>
+              
+              
+            </label>
+
+            
+          </li>
+        
+      
+        
+          
+          
+          
+          
+          
+          
+
+
+          <li>
+            <input
+              type="checkbox"
+              
+                class="hidden"
+              
+            />
+            <label
+              
+            >
+              
+                <span class="flex">
+                  <a
+                    href="../insecure/index.html"
+                    class="gdoc-nav__entry"
+                  >
+                    Test an insecure registry
+                  </a>
+                </span>
+              
+              
+            </label>
+
+            
+          </li>
+        
+      
+        
+          
+          
+          
+          
+          
+          
+
+
+          <li>
+            <input
+              type="checkbox"
+              
+                class="hidden"
+              
+            />
+            <label
+              
+            >
+              
+                <span class="flex">
+                  <a
+                    href="../notifications/index.html"
+                    class="gdoc-nav__entry"
+                  >
+                    Work with notifications
+                  </a>
+                </span>
+              
+              
+            </label>
+
+            
+          </li>
+        
+      
+    
+  </ul>
+
+            
+          </li>
+        
+      
+        
+          
+          
+          
+          
+          
+          
+
+
+          <li>
+            <input
+              type="checkbox"
+              
+                class="hidden"
+              
+            />
+            <label
+              
+            >
+              
+                <span class="flex">
+                  <a
+                    href="../../recipes/index.html"
+                    class="gdoc-nav__entry"
+                  >
+                    Recipes overview
+                  </a>
+                </span>
+              
+              
+            </label>
+
+            
+              
+  
+
+
+  <ul class="gdoc-nav__list">
+    
+    
+      
+
+      
+        
+      
+
+      
+        
+          
+          
+          
+          
+          
+          
+
+
+          <li>
+            <input
+              type="checkbox"
+              
+                class="hidden"
+              
+            />
+            <label
+              
+            >
+              
+                <span class="flex">
+                  <a
+                    href="../../recipes/apache/index.html"
+                    class="gdoc-nav__entry"
+                  >
+                    Authenticate proxy with apache
+                  </a>
+                </span>
+              
+              
+            </label>
+
+            
+          </li>
+        
+      
+        
+          
+          
+          
+          
+          
+          
+
+
+          <li>
+            <input
+              type="checkbox"
+              
+                class="hidden"
+              
+            />
+            <label
+              
+            >
+              
+                <span class="flex">
+                  <a
+                    href="../../recipes/nginx/index.html"
+                    class="gdoc-nav__entry"
+                  >
+                    Authenticate proxy with nginx
+                  </a>
+                </span>
+              
+              
+            </label>
+
+            
+          </li>
+        
+      
+        
+          
+          
+          
+          
+          
+          
+
+
+          <li>
+            <input
+              type="checkbox"
+              
+                class="hidden"
+              
+            />
+            <label
+              
+            >
+              
+                <span class="flex">
+                  <a
+                    href="../../recipes/osx-setup-guide/index.html"
+                    class="gdoc-nav__entry"
+                  >
+                    macOS setup guide
+                  </a>
+                </span>
+              
+              
+            </label>
+
+            
+          </li>
+        
+      
+        
+          
+          
+          
+          
+          
+          
+
+
+          <li>
+            <input
+              type="checkbox"
+              
+                class="hidden"
+              
+            />
+            <label
+              
+            >
+              
+                <span class="flex">
+                  <a
+                    href="../../recipes/mirror/index.html"
+                    class="gdoc-nav__entry"
+                  >
+                    Registry as a pull through cache
+                  </a>
+                </span>
+              
+              
+            </label>
+
+            
+          </li>
+        
+      
+        
+          
+          
+          
+          
+          
+          
+
+
+          <li>
+            <input
+              type="checkbox"
+              
+                class="hidden"
+              
+            />
+            <label
+              
+            >
+              
+                <span class="flex">
+                  <a
+                    href="../../recipes/systemd/index.html"
+                    class="gdoc-nav__entry"
+                  >
+                    Start registry via systemd
+                  </a>
+                </span>
+              
+              
+            </label>
+
+            
+          </li>
+        
+      
+    
+  </ul>
+
+            
+          </li>
+        
+      
+        
+          
+          
+          
+          
+          
+          
+
+
+          <li>
+            <input
+              type="checkbox"
+              
+                class="hidden"
+              
+            />
+            <label
+              
+            >
+              
+                <span class="flex">
+                  <a
+                    href="../../spec/index.html"
+                    class="gdoc-nav__entry"
+                  >
+                    Reference Overview
+                  </a>
+                </span>
+              
+              
+            </label>
+
+            
+              
+  
+
+
+  <ul class="gdoc-nav__list">
+    
+    
+      
+
+      
+        
+      
+
+      
+        
+          
+          
+          
+          
+          
+          
+
+
+          <li>
+            <input
+              type="checkbox"
+              
+                class="hidden"
+              
+            />
+            <label
+              
+            >
+              
+                <span class="flex">
+                  <a
+                    href="../../spec/auth/index.html"
+                    class="gdoc-nav__entry"
+                  >
+                    Distribution Registry Token Authentication
+                  </a>
+                </span>
+              
+              
+            </label>
+
+            
+              
+  
+
+
+  <ul class="gdoc-nav__list">
+    
+    
+      
+
+      
+        
+      
+
+      
+        
+          
+          
+          
+          
+          
+          
+
+
+          <li>
+            <input
+              type="checkbox"
+              
+                class="hidden"
+              
+            />
+            <label
+              
+            >
+              
+                <span class="flex">
+                  <a
+                    href="../../spec/auth/oauth/index.html"
+                    class="gdoc-nav__entry"
+                  >
+                    Oauth2 Token Authentication
+                  </a>
+                </span>
+              
+              
+            </label>
+
+            
+          </li>
+        
+      
+        
+          
+          
+          
+          
+          
+          
+
+
+          <li>
+            <input
+              type="checkbox"
+              
+                class="hidden"
+              
+            />
+            <label
+              
+            >
+              
+                <span class="flex">
+                  <a
+                    href="../../spec/auth/jwt/index.html"
+                    class="gdoc-nav__entry"
+                  >
+                    Token Authentication Implementation
+                  </a>
+                </span>
+              
+              
+            </label>
+
+            
+          </li>
+        
+      
+        
+          
+          
+          
+          
+          
+          
+
+
+          <li>
+            <input
+              type="checkbox"
+              
+                class="hidden"
+              
+            />
+            <label
+              
+            >
+              
+                <span class="flex">
+                  <a
+                    href="../../spec/auth/token/index.html"
+                    class="gdoc-nav__entry"
+                  >
+                    Token Authentication Specification
+                  </a>
+                </span>
+              
+              
+            </label>
+
+            
+          </li>
+        
+      
+        
+          
+          
+          
+          
+          
+          
+
+
+          <li>
+            <input
+              type="checkbox"
+              
+                class="hidden"
+              
+            />
+            <label
+              
+            >
+              
+                <span class="flex">
+                  <a
+                    href="../../spec/auth/scope/index.html"
+                    class="gdoc-nav__entry"
+                  >
+                    Token Scope Documentation
+                  </a>
+                </span>
+              
+              
+            </label>
+
+            
+          </li>
+        
+      
+    
+  </ul>
+
+            
+          </li>
+        
+      
+        
+          
+          
+          
+          
+          
+          
+
+
+          <li>
+            <input
+              type="checkbox"
+              
+                class="hidden"
+              
+            />
+            <label
+              
+            >
+              
+                <span class="flex">
+                  <a
+                    href="../../spec/api/index.html"
+                    class="gdoc-nav__entry"
+                  >
+                    HTTP API V2
+                  </a>
+                </span>
+              
+              
+            </label>
+
+            
+          </li>
+        
+      
+        
+          
+          
+          
+          
+          
+          
+
+
+          <li>
+            <input
+              type="checkbox"
+              
+                class="hidden"
+              
+            />
+            <label
+              
+            >
+              
+                <span class="flex">
+                  <a
+                    href="../../spec/manifest-v2-2/index.html"
+                    class="gdoc-nav__entry"
+                  >
+                    Image Manifest V 2, Schema 2
+                  </a>
+                </span>
+              
+              
+            </label>
+
+            
+          </li>
+        
+      
+        
+          
+          
+          
+          
+          
+          
+
+
+          <li>
+            <input
+              type="checkbox"
+              
+                class="hidden"
+              
+            />
+            <label
+              
+            >
+              
+                <span class="flex">
+                  <a
+                    href="../../spec/deprecated-schema-v1/index.html"
+                    class="gdoc-nav__entry"
+                  >
+                    Image manifest version 2, schema 1
+                  </a>
+                </span>
+              
+              
+            </label>
+
+            
+          </li>
+        
+      
+    
+  </ul>
+
+            
+          </li>
+        
+      
+        
+          
+          
+          
+          
+          
+          
+
+
+          <li>
+            <input
+              type="checkbox"
+              
+                class="hidden"
+              
+            />
+            <label
+              
+            >
+              
+                <span class="flex">
+                  <a
+                    href="../../storage-drivers/index.html"
+                    class="gdoc-nav__entry"
+                  >
+                    Registry storage driver
+                  </a>
+                </span>
+              
+              
+            </label>
+
+            
+              
+  
+
+
+  <ul class="gdoc-nav__list">
+    
+    
+      
+
+      
+        
+      
+
+      
+        
+          
+          
+          
+          
+          
+          
+
+
+          <li>
+            <input
+              type="checkbox"
+              
+                class="hidden"
+              
+            />
+            <label
+              
+            >
+              
+                <span class="flex">
+                  <a
+                    href="../../storage-drivers/filesystem/index.html"
+                    class="gdoc-nav__entry"
+                  >
+                    Filesystem storage driver
+                  </a>
+                </span>
+              
+              
+            </label>
+
+            
+          </li>
+        
+      
+        
+          
+          
+          
+          
+          
+          
+
+
+          <li>
+            <input
+              type="checkbox"
+              
+                class="hidden"
+              
+            />
+            <label
+              
+            >
+              
+                <span class="flex">
+                  <a
+                    href="../../storage-drivers/gcs/index.html"
+                    class="gdoc-nav__entry"
+                  >
+                    Google Cloud Storage driver
+                  </a>
+                </span>
+              
+              
+            </label>
+
+            
+          </li>
+        
+      
+        
+          
+          
+          
+          
+          
+          
+
+
+          <li>
+            <input
+              type="checkbox"
+              
+                class="hidden"
+              
+            />
+            <label
+              
+            >
+              
+                <span class="flex">
+                  <a
+                    href="../../storage-drivers/inmemory/index.html"
+                    class="gdoc-nav__entry"
+                  >
+                    In-memory storage driver (testing only)
+                  </a>
+                </span>
+              
+              
+            </label>
+
+            
+          </li>
+        
+      
+        
+          
+          
+          
+          
+          
+          
+
+
+          <li>
+            <input
+              type="checkbox"
+              
+                class="hidden"
+              
+            />
+            <label
+              
+            >
+              
+                <span class="flex">
+                  <a
+                    href="../../storage-drivers/azure/index.html"
+                    class="gdoc-nav__entry"
+                  >
+                    Microsoft Azure storage driver
+                  </a>
+                </span>
+              
+              
+            </label>
+
+            
+          </li>
+        
+      
+        
+          
+          
+          
+          
+          
+          
+
+
+          <li>
+            <input
+              type="checkbox"
+              
+                class="hidden"
+              
+            />
+            <label
+              
+            >
+              
+                <span class="flex">
+                  <a
+                    href="../../storage-drivers/s3/index.html"
+                    class="gdoc-nav__entry"
+                  >
+                    S3 storage driver
+                  </a>
+                </span>
+              
+              
+            </label>
+
+            
+          </li>
+        
+      
+        
+          
+          
+          
+          
+          
+          
+
+
+          <li>
+            <input
+              type="checkbox"
+              
+                class="hidden"
+              
+            />
+            <label
+              
+            >
+              
+                <span class="flex">
+                  <a
+                    href="../../storage-drivers/middleware/index.html"
+                    class="gdoc-nav__entry"
+                  >
+                    Storage middleware
+                  </a>
+                </span>
+              
+              
+            </label>
+
+            
+              
+  
+
+
+  <ul class="gdoc-nav__list">
+    
+    
+      
+
+      
+        
+      
+
+      
+        
+          
+          
+          
+          
+          
+          
+
+
+          <li>
+            <input
+              type="checkbox"
+              
+                class="hidden"
+              
+            />
+            <label
+              
+            >
+              
+                <span class="flex">
+                  <a
+                    href="../../storage-drivers/middleware/rewrite/index.html"
+                    class="gdoc-nav__entry"
+                  >
+                    Rewrite middleware
+                  </a>
+                </span>
+              
+              
+            </label>
+
+            
+          </li>
+        
+      
+    
+  </ul>
+
+            
+          </li>
+        
+      
+    
+  </ul>
+
+            
+          </li>
+        
+      
+    
+  </ul>
+
+
+
+
+
+
+    
+  </section>
+
+  
+
+
+  <section class="gdoc-nav--more">
+    
+  </section>
+</nav>
+
+          </aside>
+        
+
+
+        <div class="gdoc-page">
+          
+  
+
+
+  
+
+
+
+
+
+
+<div
+  class="gdoc-page__header flex flex-wrap
+  
+    justify-between
+  
+  
+  "
+  itemprop="breadcrumb"
+>
+  
+    <div>
+      <svg class="gdoc-icon gdoc_path hidden-mobile"><use xlink:href="#gdoc_path"></use></svg>
+      <ol class="breadcrumb" itemscope itemtype="https://schema.org/BreadcrumbList">
+        
+        
+        
+        
+  
+  
+    
+    
+    
+    
+  
+  
+    
+    
+    
+    
+  
+  
+    <li itemprop='itemListElement' itemscope itemtype='https://schema.org/ListItem'><a itemscope itemtype='https://schema.org/WebPage' itemprop='item' itemid='/distribution/' href='../../../distribution.html'><span itemprop='name'>Distribution Registry</span></a><meta itemprop='position' content='2' /></li><li> / </li><li itemprop='itemListElement' itemscope itemtype='https://schema.org/ListItem'><a itemscope itemtype='https://schema.org/WebPage' itemprop='item' itemid='/distribution/about/' href='../index.html'><span itemprop='name'>About Registry</span></a><meta itemprop='position' content='3' /></li><li> / </li><li itemprop='itemListElement' itemscope itemtype='https://schema.org/ListItem'><span itemprop='name'>Deploy a registry server</span><meta itemprop='position' content='4' /></li>
+  
+
+  
+
+  
+
+      </ol>
+    </div>
+  
+  
+    <div>
+      <span class="editpage">
+        <svg class="gdoc-icon gdoc_code"><use xlink:href="#gdoc_code"></use></svg>
+        <a
+          href="https://github.com/distribution/distribution/edit/main/docs/content/about/deploying.md"
+        >
+          Edit page
+        </a>
+      </span>
+    </div>
+  
+</div>
+
+
+
+  <article
+    class="gdoc-markdown gdoc-markdown__align--left"
+  >
+    <h1>Deploy a registry server</h1>
+    <p>Before you can deploy a registry, you need to install Docker on the host.
+A registry is an instance of the <code>registry</code> image, and runs within Docker.</p>
+<p>This topic provides basic information about deploying and configuring a
+registry. For an exhaustive list of configuration options, see the
+<a href="../configuration/index.html">configuration reference</a>.</p>
+<p>If you have an air-gapped datacenter, see
+<a href="index.html#considerations-for-air-gapped-registries">Considerations for air-gapped registries</a>.</p>
+<div class="flex align-center gdoc-page__anchorwrap">
+    <h2 id="run-a-local-registry"
+    >
+        Run a local registry
+    </h2>
+    <a data-clipboard-text="https://distribution.github.io/distribution/about/deploying/#run-a-local-registry" class="gdoc-page__anchor clip flex align-center" title="Anchor to: Run a local registry" aria-label="Anchor to: Run a local registry" href="index.html#run-a-local-registry">
+        <svg class="gdoc-icon gdoc_link"><use xlink:href="#gdoc_link"></use></svg>
+    </a>
+</div>
+<p>Use a command like the following to start the registry container:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">$</span> docker run -d -p 5000:5000 --restart<span class="o">=</span>always --name registry registry:2
+</span></span></code></pre></div><p>The registry is now ready to use.</p>
+<blockquote>
+<p><strong>Warning</strong>: These first few examples show registry configurations that are
+only appropriate for testing. A production-ready registry must be protected by
+TLS and should ideally use an access-control mechanism. Keep reading and then
+continue to the <a href="../configuration/index.html">configuration guide</a> to deploy a
+production-ready registry.</p>
+</blockquote>
+<div class="flex align-center gdoc-page__anchorwrap">
+    <h2 id="copy-an-image-from-docker-hub-to-your-registry"
+    >
+        Copy an image from Docker Hub to your registry
+    </h2>
+    <a data-clipboard-text="https://distribution.github.io/distribution/about/deploying/#copy-an-image-from-docker-hub-to-your-registry" class="gdoc-page__anchor clip flex align-center" title="Anchor to: Copy an image from Docker Hub to your registry" aria-label="Anchor to: Copy an image from Docker Hub to your registry" href="index.html#copy-an-image-from-docker-hub-to-your-registry">
+        <svg class="gdoc-icon gdoc_link"><use xlink:href="#gdoc_link"></use></svg>
+    </a>
+</div>
+<p>You can pull an image from Docker Hub and push it to your registry. The
+following example pulls the <code>ubuntu:16.04</code> image from Docker Hub and re-tags it
+as <code>my-ubuntu</code>, then pushes it to the local registry. Finally, the
+<code>ubuntu:16.04</code> and <code>my-ubuntu</code> images are deleted locally and the
+<code>my-ubuntu</code> image is pulled from the local registry.</p>
+<ol>
+<li>
+<p>Pull the <code>ubuntu:16.04</code> image from Docker Hub.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">$</span> docker pull ubuntu:16.04
+</span></span></code></pre></div></li>
+<li>
+<p>Tag the image as <code>localhost:5000/my-ubuntu</code>. This creates an additional tag
+for the existing image. When the first part of the tag is a hostname and
+port, Docker interprets this as the location of a registry, when pushing.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">$</span> docker tag ubuntu:16.04 localhost:5000/my-ubuntu
+</span></span></code></pre></div></li>
+<li>
+<p>Push the image to the local registry running at <code>localhost:5000</code>:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">$</span> docker push localhost:5000/my-ubuntu
+</span></span></code></pre></div></li>
+<li>
+<p>Remove the locally-cached <code>ubuntu:16.04</code> and <code>localhost:5000/my-ubuntu</code>
+images, so that you can test pulling the image from your registry. This
+does not remove the <code>localhost:5000/my-ubuntu</code> image from your registry.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">$</span> docker image remove ubuntu:16.04
+</span></span><span class="line"><span class="cl"><span class="gp">$</span> docker image remove localhost:5000/my-ubuntu
+</span></span></code></pre></div></li>
+<li>
+<p>Pull the <code>localhost:5000/my-ubuntu</code> image from your local registry.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">$</span> docker pull localhost:5000/my-ubuntu
+</span></span></code></pre></div></li>
+</ol>
+<div class="flex align-center gdoc-page__anchorwrap">
+    <h2 id="stop-a-local-registry"
+    >
+        Stop a local registry
+    </h2>
+    <a data-clipboard-text="https://distribution.github.io/distribution/about/deploying/#stop-a-local-registry" class="gdoc-page__anchor clip flex align-center" title="Anchor to: Stop a local registry" aria-label="Anchor to: Stop a local registry" href="index.html#stop-a-local-registry">
+        <svg class="gdoc-icon gdoc_link"><use xlink:href="#gdoc_link"></use></svg>
+    </a>
+</div>
+<p>To stop the registry, use the same <code>docker container stop</code> command as with any other
+container.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">$</span> docker container stop registry
+</span></span></code></pre></div><p>To remove the container, use <code>docker container rm</code>.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">$</span> docker container stop registry <span class="o">&amp;&amp;</span> docker container rm -v registry
+</span></span></code></pre></div><div class="flex align-center gdoc-page__anchorwrap">
+    <h2 id="basic-configuration"
+    >
+        Basic configuration
+    </h2>
+    <a data-clipboard-text="https://distribution.github.io/distribution/about/deploying/#basic-configuration" class="gdoc-page__anchor clip flex align-center" title="Anchor to: Basic configuration" aria-label="Anchor to: Basic configuration" href="index.html#basic-configuration">
+        <svg class="gdoc-icon gdoc_link"><use xlink:href="#gdoc_link"></use></svg>
+    </a>
+</div>
+<p>To configure the container, you can pass additional or modified options to the
+<code>docker run</code> command.</p>
+<p>The following sections provide basic guidelines for configuring your registry.
+For more details, see the <a href="../configuration/index.html">registry configuration reference</a>.</p>
+<div class="flex align-center gdoc-page__anchorwrap">
+    <h3 id="start-the-registry-automatically"
+    >
+        Start the registry automatically
+    </h3>
+    <a data-clipboard-text="https://distribution.github.io/distribution/about/deploying/#start-the-registry-automatically" class="gdoc-page__anchor clip flex align-center" title="Anchor to: Start the registry automatically" aria-label="Anchor to: Start the registry automatically" href="index.html#start-the-registry-automatically">
+        <svg class="gdoc-icon gdoc_link"><use xlink:href="#gdoc_link"></use></svg>
+    </a>
+</div>
+<p>If you want to use the registry as part of your permanent infrastructure, you
+should set it to restart automatically when Docker restarts or if it exits.
+This example uses the <code>--restart always</code> flag to set a restart policy for the
+registry.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">$</span> docker run -d <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span><span class="go">  -p 5000:5000 \
+</span></span></span><span class="line"><span class="cl"><span class="go">  --restart=always \
+</span></span></span><span class="line"><span class="cl"><span class="go">  --name registry \
+</span></span></span><span class="line"><span class="cl"><span class="go">  registry:2
+</span></span></span></code></pre></div><div class="flex align-center gdoc-page__anchorwrap">
+    <h3 id="customize-the-published-port"
+    >
+        Customize the published port
+    </h3>
+    <a data-clipboard-text="https://distribution.github.io/distribution/about/deploying/#customize-the-published-port" class="gdoc-page__anchor clip flex align-center" title="Anchor to: Customize the published port" aria-label="Anchor to: Customize the published port" href="index.html#customize-the-published-port">
+        <svg class="gdoc-icon gdoc_link"><use xlink:href="#gdoc_link"></use></svg>
+    </a>
+</div>
+<p>If you are already using port 5000, or you want to run multiple local
+registries to separate areas of concern, you can customize the registry&rsquo;s
+port settings. This example runs the registry on port 5001 and also names it
+<code>registry-test</code>. Remember, the first part of the <code>-p</code> value is the host port
+and the second part is the port within the container. Within the container, the
+registry listens on port <code>5000</code> by default.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">$</span> docker run -d <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span><span class="go">  -p 5001:5000 \
+</span></span></span><span class="line"><span class="cl"><span class="go">  --name registry-test \
+</span></span></span><span class="line"><span class="cl"><span class="go">  registry:2
+</span></span></span></code></pre></div><p>If you want to change the port the registry listens on within the container, you
+can use the environment variable <code>REGISTRY_HTTP_ADDR</code> to change it. This command
+causes the registry to listen on port 5001 within the container:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">$</span> docker run -d <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span><span class="go">  -e REGISTRY_HTTP_ADDR=0.0.0.0:5001 \
+</span></span></span><span class="line"><span class="cl"><span class="go">  -p 5001:5001 \
+</span></span></span><span class="line"><span class="cl"><span class="go">  --name registry-test \
+</span></span></span><span class="line"><span class="cl"><span class="go">  registry:2
+</span></span></span></code></pre></div><div class="flex align-center gdoc-page__anchorwrap">
+    <h2 id="storage-customization"
+    >
+        Storage customization
+    </h2>
+    <a data-clipboard-text="https://distribution.github.io/distribution/about/deploying/#storage-customization" class="gdoc-page__anchor clip flex align-center" title="Anchor to: Storage customization" aria-label="Anchor to: Storage customization" href="index.html#storage-customization">
+        <svg class="gdoc-icon gdoc_link"><use xlink:href="#gdoc_link"></use></svg>
+    </a>
+</div>
+<div class="flex align-center gdoc-page__anchorwrap">
+    <h3 id="customize-the-storage-location"
+    >
+        Customize the storage location
+    </h3>
+    <a data-clipboard-text="https://distribution.github.io/distribution/about/deploying/#customize-the-storage-location" class="gdoc-page__anchor clip flex align-center" title="Anchor to: Customize the storage location" aria-label="Anchor to: Customize the storage location" href="index.html#customize-the-storage-location">
+        <svg class="gdoc-icon gdoc_link"><use xlink:href="#gdoc_link"></use></svg>
+    </a>
+</div>
+<p>By default, your registry data is persisted as a <a href="https://docs.docker.com/storage/volumes" target="_blank">docker volume</a>
+on the host filesystem. If you want to store your registry contents at a specific
+location on your host filesystem, such as if you have an SSD or SAN mounted into
+a particular directory, you might decide to use a bind mount instead. A bind mount
+is more dependent on the filesystem layout of the Docker host, but more performant
+in many situations. The following example bind-mounts the host directory
+<code>/mnt/registry</code> into the registry container at <code>/var/lib/registry/</code>.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">$</span> docker run -d <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span><span class="go">  -p 5000:5000 \
+</span></span></span><span class="line"><span class="cl"><span class="go">  --restart=always \
+</span></span></span><span class="line"><span class="cl"><span class="go">  --name registry \
+</span></span></span><span class="line"><span class="cl"><span class="go">  -v /mnt/registry:/var/lib/registry \
+</span></span></span><span class="line"><span class="cl"><span class="go">  registry:2
+</span></span></span></code></pre></div><div class="flex align-center gdoc-page__anchorwrap">
+    <h3 id="customize-the-storage-back-end"
+    >
+        Customize the storage back-end
+    </h3>
+    <a data-clipboard-text="https://distribution.github.io/distribution/about/deploying/#customize-the-storage-back-end" class="gdoc-page__anchor clip flex align-center" title="Anchor to: Customize the storage back-end" aria-label="Anchor to: Customize the storage back-end" href="index.html#customize-the-storage-back-end">
+        <svg class="gdoc-icon gdoc_link"><use xlink:href="#gdoc_link"></use></svg>
+    </a>
+</div>
+<p>By default, the registry stores its data on the local filesystem, whether you
+use a bind mount or a volume. You can store the registry data in an Amazon S3
+bucket, Google Cloud Platform, or on another storage back-end by using
+<a href="../../storage-drivers/index.html">storage drivers</a>. For more information, see
+<a href="../configuration/index.html#storage">storage configuration options</a>.</p>
+<div class="flex align-center gdoc-page__anchorwrap">
+    <h2 id="run-an-externally-accessible-registry"
+    >
+        Run an externally-accessible registry
+    </h2>
+    <a data-clipboard-text="https://distribution.github.io/distribution/about/deploying/#run-an-externally-accessible-registry" class="gdoc-page__anchor clip flex align-center" title="Anchor to: Run an externally-accessible registry" aria-label="Anchor to: Run an externally-accessible registry" href="index.html#run-an-externally-accessible-registry">
+        <svg class="gdoc-icon gdoc_link"><use xlink:href="#gdoc_link"></use></svg>
+    </a>
+</div>
+<p>Running a registry only accessible on <code>localhost</code> has limited usefulness. In
+order to make your registry accessible to external hosts, you must first secure
+it using TLS.</p>
+<p>This example is extended in <a href="index.html#run-the-registry-as-a-service">Run the registry as a
+service</a> below.</p>
+<div class="flex align-center gdoc-page__anchorwrap">
+    <h3 id="get-a-certificate"
+    >
+        Get a certificate
+    </h3>
+    <a data-clipboard-text="https://distribution.github.io/distribution/about/deploying/#get-a-certificate" class="gdoc-page__anchor clip flex align-center" title="Anchor to: Get a certificate" aria-label="Anchor to: Get a certificate" href="index.html#get-a-certificate">
+        <svg class="gdoc-icon gdoc_link"><use xlink:href="#gdoc_link"></use></svg>
+    </a>
+</div>
+<p>These examples assume the following:</p>
+<ul>
+<li>Your registry URL is <code>https://myregistry.domain.com/</code>.</li>
+<li>Your DNS, routing, and firewall settings allow access to the registry&rsquo;s host
+on port 443.</li>
+<li>You have already obtained a certificate from a certificate authority (CA).</li>
+</ul>
+<p>If you have been issued an <em>intermediate</em> certificate instead, see
+<a href="index.html#use-an-intermediate-certificate">use an intermediate certificate</a>.</p>
+<ol>
+<li>
+<p>Create a <code>certs</code> directory.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">$</span> mkdir -p certs
+</span></span></code></pre></div><p>Copy the <code>.crt</code> and <code>.key</code> files from the CA into the <code>certs</code> directory.
+The following steps assume that the files are named <code>domain.crt</code> and
+<code>domain.key</code>.</p>
+</li>
+<li>
+<p>Stop the registry if it is currently running.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">$</span> docker container stop registry
+</span></span></code></pre></div></li>
+<li>
+<p>Restart the registry, directing it to use the TLS certificate. This command
+bind-mounts the <code>certs/</code> directory into the container at <code>/certs/</code>, and sets
+environment variables that tell the container where to find the <code>domain.crt</code>
+and <code>domain.key</code> file. The registry runs on port 443, the default HTTPS port.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">$</span> docker run -d <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span><span class="go">  --restart=always \
+</span></span></span><span class="line"><span class="cl"><span class="go">  --name registry \
+</span></span></span><span class="line"><span class="cl"><span class="go">  -v &#34;$(pwd)&#34;/certs:/certs \
+</span></span></span><span class="line"><span class="cl"><span class="go">  -e REGISTRY_HTTP_ADDR=0.0.0.0:443 \
+</span></span></span><span class="line"><span class="cl"><span class="go">  -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt \
+</span></span></span><span class="line"><span class="cl"><span class="go">  -e REGISTRY_HTTP_TLS_KEY=/certs/domain.key \
+</span></span></span><span class="line"><span class="cl"><span class="go">  -p 443:443 \
+</span></span></span><span class="line"><span class="cl"><span class="go">  registry:2
+</span></span></span></code></pre></div></li>
+<li>
+<p>Docker clients can now pull from and push to your registry using its
+external address. The following commands demonstrate this:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">$</span> docker pull ubuntu:16.04
+</span></span><span class="line"><span class="cl"><span class="gp">$</span> docker tag ubuntu:16.04 myregistry.domain.com/my-ubuntu
+</span></span><span class="line"><span class="cl"><span class="gp">$</span> docker push myregistry.domain.com/my-ubuntu
+</span></span><span class="line"><span class="cl"><span class="gp">$</span> docker pull myregistry.domain.com/my-ubuntu
+</span></span></code></pre></div></li>
+</ol>
+<div class="flex align-center gdoc-page__anchorwrap">
+    <h4 id="use-an-intermediate-certificate"
+    >
+        Use an intermediate certificate
+    </h4>
+    <a data-clipboard-text="https://distribution.github.io/distribution/about/deploying/#use-an-intermediate-certificate" class="gdoc-page__anchor clip flex align-center" title="Anchor to: Use an intermediate certificate" aria-label="Anchor to: Use an intermediate certificate" href="index.html#use-an-intermediate-certificate">
+        <svg class="gdoc-icon gdoc_link"><use xlink:href="#gdoc_link"></use></svg>
+    </a>
+</div>
+<p>A certificate issuer may supply you with an <em>intermediate</em> certificate. In this
+case, you must concatenate your certificate with the intermediate certificate to
+form a <em>certificate bundle</em>. You can do this using the <code>cat</code> command:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="go">cat domain.crt intermediate-certificates.pem &gt; certs/domain.crt
+</span></span></span></code></pre></div><p>You can use the certificate bundle just as you use the <code>domain.crt</code> file in
+the previous example.</p>
+<div class="flex align-center gdoc-page__anchorwrap">
+    <h3 id="support-for-lets-encrypt"
+    >
+        Support for Let&rsquo;s Encrypt
+    </h3>
+    <a data-clipboard-text="https://distribution.github.io/distribution/about/deploying/#support-for-lets-encrypt" class="gdoc-page__anchor clip flex align-center" title="Anchor to: Support for Let&rsquo;s Encrypt" aria-label="Anchor to: Support for Let&rsquo;s Encrypt" href="index.html#support-for-lets-encrypt">
+        <svg class="gdoc-icon gdoc_link"><use xlink:href="#gdoc_link"></use></svg>
+    </a>
+</div>
+<p>The registry supports using Let&rsquo;s Encrypt to automatically obtain a
+browser-trusted certificate. For more information on Let&rsquo;s Encrypt, see
+<a href="https://letsencrypt.org/how-it-works/" target="_blank">https://letsencrypt.org/how-it-works/</a>
+and the relevant section of the
+<a href="../configuration/index.html#letsencrypt">registry configuration</a>.</p>
+<div class="flex align-center gdoc-page__anchorwrap">
+    <h3 id="use-an-insecure-registry-testing-only"
+    >
+        Use an insecure registry (testing only)
+    </h3>
+    <a data-clipboard-text="https://distribution.github.io/distribution/about/deploying/#use-an-insecure-registry-testing-only" class="gdoc-page__anchor clip flex align-center" title="Anchor to: Use an insecure registry (testing only)" aria-label="Anchor to: Use an insecure registry (testing only)" href="index.html#use-an-insecure-registry-testing-only">
+        <svg class="gdoc-icon gdoc_link"><use xlink:href="#gdoc_link"></use></svg>
+    </a>
+</div>
+<p>It is possible to use a self-signed certificate, or to use our registry
+insecurely. Unless you have set up verification for your self-signed
+certificate, this is for testing only. See <a href="../insecure/index.html">run an insecure registry</a>.</p>
+<div class="flex align-center gdoc-page__anchorwrap">
+    <h2 id="run-the-registry-as-a-service"
+    >
+        Run the registry as a service
+    </h2>
+    <a data-clipboard-text="https://distribution.github.io/distribution/about/deploying/#run-the-registry-as-a-service" class="gdoc-page__anchor clip flex align-center" title="Anchor to: Run the registry as a service" aria-label="Anchor to: Run the registry as a service" href="index.html#run-the-registry-as-a-service">
+        <svg class="gdoc-icon gdoc_link"><use xlink:href="#gdoc_link"></use></svg>
+    </a>
+</div>
+<p><a href="https://docs.docker.com/engine/swarm/services" target="_blank">Swarm services</a> provide several advantages over
+standalone containers. They use a declarative model, which means that you define
+the desired state and Docker works to keep your service in that state. Services
+provide automatic load balancing scaling, and the ability to control the
+distribution of your service, among other advantages. Services also allow you to
+store sensitive data such as TLS certificates in
+<a href="https://docs.docker.com/engine/swarm/secrets" target="_blank">secrets</a>.</p>
+<p>The storage back-end you use determines whether you use a fully scaled service
+or a service with either only a single node or a node constraint.</p>
+<ul>
+<li>
+<p>If you use a distributed storage driver, such as Amazon S3, you can use a
+fully replicated service. Each worker can write to the storage back-end
+without causing write conflicts.</p>
+</li>
+<li>
+<p>If you use a local bind mount or volume, each worker node writes to its
+own storage location, which means that each registry contains a different
+data set. You can solve this problem by using a single-replica service and a
+node constraint to ensure that only a single worker is writing to the bind
+mount.</p>
+</li>
+</ul>
+<p>The following example starts a registry as a single-replica service, which is
+accessible on any swarm node on port 80. It assumes you are using the same
+TLS certificates as in the previous examples.</p>
+<p>First, save the TLS certificate and key as secrets:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">$</span> docker secret create domain.crt certs/domain.crt
+</span></span><span class="line"><span class="cl"><span class="err">
+</span></span></span><span class="line"><span class="cl"><span class="err"></span><span class="gp">$</span> docker secret create domain.key certs/domain.key
+</span></span></code></pre></div><p>Next, add a label to the node where you want to run the registry.
+To get the node&rsquo;s name, use <code>docker node ls</code>. Substitute your node&rsquo;s name for
+<code>node1</code> below.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">$</span> docker node update --label-add <span class="nv">registry</span><span class="o">=</span><span class="nb">true</span> node1
+</span></span></code></pre></div><p>Next, create the service, granting it access to the two secrets and constraining
+it to only run on nodes with the label <code>registry=true</code>. Besides the constraint,
+you are also specifying that only a single replica should run at a time. The
+example bind-mounts <code>/mnt/registry</code> on the swarm node to <code>/var/lib/registry/</code>
+within the container. Bind mounts rely on the pre-existing source directory,
+so be sure <code>/mnt/registry</code> exists on <code>node1</code>. You might need to create it before
+running the following <code>docker service create</code> command.</p>
+<p>By default, secrets are mounted into a service at <code>/run/secrets/&lt;secret-name&gt;</code>.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">$</span> docker service create <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span><span class="go">  --name registry \
+</span></span></span><span class="line"><span class="cl"><span class="go">  --secret domain.crt \
+</span></span></span><span class="line"><span class="cl"><span class="go">  --secret domain.key \
+</span></span></span><span class="line"><span class="cl"><span class="go">  --constraint &#39;node.labels.registry==true&#39; \
+</span></span></span><span class="line"><span class="cl"><span class="go">  --mount type=bind,src=/mnt/registry,dst=/var/lib/registry \
+</span></span></span><span class="line"><span class="cl"><span class="go">  -e REGISTRY_HTTP_ADDR=0.0.0.0:443 \
+</span></span></span><span class="line"><span class="cl"><span class="go">  -e REGISTRY_HTTP_TLS_CERTIFICATE=/run/secrets/domain.crt \
+</span></span></span><span class="line"><span class="cl"><span class="go">  -e REGISTRY_HTTP_TLS_KEY=/run/secrets/domain.key \
+</span></span></span><span class="line"><span class="cl"><span class="go">  --publish published=443,target=443 \
+</span></span></span><span class="line"><span class="cl"><span class="go">  --replicas 1 \
+</span></span></span><span class="line"><span class="cl"><span class="go">  registry:2
+</span></span></span></code></pre></div><p>You can access the service on port 443 of any swarm node. Docker sends the
+requests to the node which is running the service.</p>
+<div class="flex align-center gdoc-page__anchorwrap">
+    <h2 id="load-balancing-considerations"
+    >
+        Load balancing considerations
+    </h2>
+    <a data-clipboard-text="https://distribution.github.io/distribution/about/deploying/#load-balancing-considerations" class="gdoc-page__anchor clip flex align-center" title="Anchor to: Load balancing considerations" aria-label="Anchor to: Load balancing considerations" href="index.html#load-balancing-considerations">
+        <svg class="gdoc-icon gdoc_link"><use xlink:href="#gdoc_link"></use></svg>
+    </a>
+</div>
+<p>One may want to use a load balancer to distribute load, terminate TLS or
+provide high availability. While a full load balancing setup is outside the
+scope of this document, there are a few considerations that can make the process
+smoother.</p>
+<p>The most important aspect is that a load balanced cluster of registries must
+share the same resources. For the current version of the registry, this means
+the following must be the same:</p>
+<ul>
+<li>Storage Driver</li>
+<li>HTTP Secret</li>
+<li>Redis Cache (if configured)</li>
+</ul>
+<p>Differences in any of the above cause problems serving requests.
+As an example, if you&rsquo;re using the filesystem driver, all registry instances
+must have access to the same filesystem root, on
+the same machine. For other drivers, such as S3 or Azure, they should be
+accessing the same resource and share an identical configuration.
+The <em>HTTP Secret</em> coordinates uploads, so also must be the same across
+instances. Configuring different redis instances works (at the time
+of writing), but is not optimal if the instances are not shared, because
+more requests are directed to the backend.</p>
+<div class="flex align-center gdoc-page__anchorwrap">
+    <h3 id="importantrequired-http-headers"
+    >
+        Important/Required HTTP-Headers
+    </h3>
+    <a data-clipboard-text="https://distribution.github.io/distribution/about/deploying/#importantrequired-http-headers" class="gdoc-page__anchor clip flex align-center" title="Anchor to: Important/Required HTTP-Headers" aria-label="Anchor to: Important/Required HTTP-Headers" href="index.html#importantrequired-http-headers">
+        <svg class="gdoc-icon gdoc_link"><use xlink:href="#gdoc_link"></use></svg>
+    </a>
+</div>
+<p>Getting the headers correct is very important. For all responses to any
+request under the &ldquo;/v2/&rdquo; url space, the <code>Docker-Distribution-API-Version</code>
+header should be set to the value &ldquo;registry/2.0&rdquo;, even for a 4xx response.
+This header allows the docker engine to quickly resolve authentication realms
+and fallback to version 1 registries, if necessary. Confirming this is setup
+correctly can help avoid problems with fallback.</p>
+<p>In the same train of thought, you must make sure you are properly sending the
+<code>X-Forwarded-Proto</code>, <code>X-Forwarded-For</code>, and <code>Host</code> headers to their &ldquo;client-side&rdquo;
+values. Failure to do so usually makes the registry issue redirects to internal
+hostnames or downgrading from https to http.</p>
+<p>A properly secured registry should return 401 when the &ldquo;/v2/&rdquo; endpoint is hit
+without credentials. The response should include a <code>WWW-Authenticate</code>
+challenge, providing guidance on how to authenticate, such as with basic auth
+or a token service. If the load balancer has health checks, it is recommended
+to configure it to consider a 401 response as healthy and any other as down.
+This secures your registry by ensuring that configuration problems with
+authentication don&rsquo;t accidentally expose an unprotected registry. If you&rsquo;re
+using a less sophisticated load balancer, such as Amazon&rsquo;s Elastic Load
+Balancer, that doesn&rsquo;t allow one to change the healthy response code, health
+checks can be directed at &ldquo;/&rdquo;, which always returns a <code>200 OK</code> response.</p>
+<div class="flex align-center gdoc-page__anchorwrap">
+    <h2 id="restricting-access"
+    >
+        Restricting access
+    </h2>
+    <a data-clipboard-text="https://distribution.github.io/distribution/about/deploying/#restricting-access" class="gdoc-page__anchor clip flex align-center" title="Anchor to: Restricting access" aria-label="Anchor to: Restricting access" href="index.html#restricting-access">
+        <svg class="gdoc-icon gdoc_link"><use xlink:href="#gdoc_link"></use></svg>
+    </a>
+</div>
+<p>Except for registries running on secure local networks, registries should always
+implement access restrictions.</p>
+<div class="flex align-center gdoc-page__anchorwrap">
+    <h3 id="native-basic-auth"
+    >
+        Native basic auth
+    </h3>
+    <a data-clipboard-text="https://distribution.github.io/distribution/about/deploying/#native-basic-auth" class="gdoc-page__anchor clip flex align-center" title="Anchor to: Native basic auth" aria-label="Anchor to: Native basic auth" href="index.html#native-basic-auth">
+        <svg class="gdoc-icon gdoc_link"><use xlink:href="#gdoc_link"></use></svg>
+    </a>
+</div>
+<p>The simplest way to achieve access restriction is through basic authentication
+(this is very similar to other web servers&rsquo; basic authentication mechanism).
+This example uses native basic authentication using <code>htpasswd</code> to store the
+secrets.</p>
+
+
+
+
+
+<blockquote class="gdoc-hint warning">
+  <div class="gdoc-hint__title flex align-center"><i class="fa warning" title="Warning"></i></div>
+  <div class="gdoc-hint__text">You <strong>cannot</strong> use authentication with authentication schemes that send
+credentials as clear text. You must
+<a href="index.html#run-an-externally-accessible-registry">configure TLS first</a> for
+authentication to work.</div>
+</blockquote>
+
+
+
+
+
+
+<blockquote class="gdoc-hint warning">
+  <div class="gdoc-hint__title flex align-center"><i class="fa warning" title="Warning"></i></div>
+  <div class="gdoc-hint__text">The distribution registry <strong>only</strong> supports htpasswd credentials in
+bcrypt format, so if you omit the <code>-B</code> option when generating the credential
+using htpasswd, all authentication attempts will fail.</div>
+</blockquote>
+
+<ol>
+<li>
+<p>Create a password file with one entry for the user <code>testuser</code>, with password
+<code>testpassword</code>:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">$</span> mkdir auth
+</span></span><span class="line"><span class="cl"><span class="gp">$</span> docker run <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span><span class="go">  --entrypoint htpasswd \
+</span></span></span><span class="line"><span class="cl"><span class="go">  httpd:2 -Bbn testuser testpassword &gt; auth/htpasswd
+</span></span></span></code></pre></div><p>On Windows, make sure the output file is correctly encoded:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-powershell" data-lang="powershell"><span class="line"><span class="cl"><span class="n">docker</span> <span class="n">run</span> <span class="p">-</span><span class="n">-rm</span> <span class="p">-</span><span class="n">-entrypoint</span> <span class="n">htpasswd</span> <span class="n">httpd</span><span class="err">:</span><span class="mf">2</span> <span class="n">-Bbn</span> <span class="n">testuser</span> <span class="n">testpassword</span> <span class="p">|</span> <span class="nb">Set-Content</span> <span class="n">-Encoding</span> <span class="n">ASCII</span> <span class="n">auth</span><span class="p">/</span><span class="n">htpasswd</span>
+</span></span></code></pre></div></li>
+<li>
+<p>Stop the registry.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">$</span> docker container stop registry
+</span></span></code></pre></div></li>
+<li>
+<p>Start the registry with basic authentication.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">$</span> docker run -d <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span><span class="go">  -p 5000:5000 \
+</span></span></span><span class="line"><span class="cl"><span class="go">  --restart=always \
+</span></span></span><span class="line"><span class="cl"><span class="go">  --name registry \
+</span></span></span><span class="line"><span class="cl"><span class="go">  -v &#34;$(pwd)&#34;/auth:/auth \
+</span></span></span><span class="line"><span class="cl"><span class="go">  -e &#34;REGISTRY_AUTH=htpasswd&#34; \
+</span></span></span><span class="line"><span class="cl"><span class="go">  -e &#34;REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm&#34; \
+</span></span></span><span class="line"><span class="cl"><span class="go">  -e REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd \
+</span></span></span><span class="line"><span class="cl"><span class="go">  -v &#34;$(pwd)&#34;/certs:/certs \
+</span></span></span><span class="line"><span class="cl"><span class="go">  -e REGISTRY_HTTP_TLS_CERTIFICATE=/certs/domain.crt \
+</span></span></span><span class="line"><span class="cl"><span class="go">  -e REGISTRY_HTTP_TLS_KEY=/certs/domain.key \
+</span></span></span><span class="line"><span class="cl"><span class="go">  registry:2
+</span></span></span></code></pre></div></li>
+<li>
+<p>Try to pull an image from the registry, or push an image to the registry.
+These commands fail.</p>
+</li>
+<li>
+<p>Log in to the registry.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">$</span> docker login myregistrydomain.com:5000
+</span></span></code></pre></div><p>Provide the username and password from the first step.</p>
+<p>Test that you can now pull an image from the registry or push an image to
+the registry.</p>
+</li>
+</ol>
+
+
+
+
+
+<blockquote class="gdoc-hint note">
+  <div class="gdoc-hint__title flex align-center"><i class="fa note" title="X509 errors"></i></div>
+  <div class="gdoc-hint__text">X509 errors usually indicate that you are attempting to use
+a self-signed certificate without configuring the Docker daemon correctly.
+See <a href="../insecure/index.html">run an insecure registry</a>.</div>
+</blockquote>
+
+<div class="flex align-center gdoc-page__anchorwrap">
+    <h3 id="more-advanced-authentication"
+    >
+        More advanced authentication
+    </h3>
+    <a data-clipboard-text="https://distribution.github.io/distribution/about/deploying/#more-advanced-authentication" class="gdoc-page__anchor clip flex align-center" title="Anchor to: More advanced authentication" aria-label="Anchor to: More advanced authentication" href="index.html#more-advanced-authentication">
+        <svg class="gdoc-icon gdoc_link"><use xlink:href="#gdoc_link"></use></svg>
+    </a>
+</div>
+<p>You may want to leverage more advanced basic auth implementations by using a
+proxy in front of the registry. See the <a href="../../recipes/index.html">recipes list</a>.</p>
+<p>The registry also supports delegated authentication which redirects users to a
+specific trusted token server. This approach is more complicated to set up, and
+only makes sense if you need to fully configure ACLs and need more control over
+the registry&rsquo;s integration into your global authorization and authentication
+systems. Refer to the following <a href="../../spec/auth/token/index.html">background information</a> and
+<a href="../configuration/index.html#auth">configuration information here</a>.</p>
+<p>This approach requires you to implement your own authentication system or
+leverage a third-party implementation.</p>
+<div class="flex align-center gdoc-page__anchorwrap">
+    <h2 id="deploy-your-registry-using-a-compose-file"
+    >
+        Deploy your registry using a Compose file
+    </h2>
+    <a data-clipboard-text="https://distribution.github.io/distribution/about/deploying/#deploy-your-registry-using-a-compose-file" class="gdoc-page__anchor clip flex align-center" title="Anchor to: Deploy your registry using a Compose file" aria-label="Anchor to: Deploy your registry using a Compose file" href="index.html#deploy-your-registry-using-a-compose-file">
+        <svg class="gdoc-icon gdoc_link"><use xlink:href="#gdoc_link"></use></svg>
+    </a>
+</div>
+<p>If your registry invocation is advanced, it may be easier to use a Docker
+compose file to deploy it, rather than relying on a specific <code>docker run</code>
+invocation. Use the following example <code>docker-compose.yml</code> as a template.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nt">registry</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">restart</span><span class="p">:</span><span class="w"> </span><span class="l">always</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l">registry:2</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">ports</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span>- <span class="m">5000</span><span class="p">:</span><span class="m">5000</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">environment</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">REGISTRY_HTTP_TLS_CERTIFICATE</span><span class="p">:</span><span class="w"> </span><span class="l">/certs/domain.crt</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">REGISTRY_HTTP_TLS_KEY</span><span class="p">:</span><span class="w"> </span><span class="l">/certs/domain.key</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">REGISTRY_AUTH</span><span class="p">:</span><span class="w"> </span><span class="l">htpasswd</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">REGISTRY_AUTH_HTPASSWD_PATH</span><span class="p">:</span><span class="w"> </span><span class="l">/auth/htpasswd</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">REGISTRY_AUTH_HTPASSWD_REALM</span><span class="p">:</span><span class="w"> </span><span class="l">Registry Realm</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">volumes</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span>- <span class="l">/path/data:/var/lib/registry</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span>- <span class="l">/path/certs:/certs</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span>- <span class="l">/path/auth:/auth</span><span class="w">
+</span></span></span></code></pre></div><p>Replace <code>/path</code> with the directory which contains the <code>certs/</code> and <code>auth/</code>
+directories.
+{:.warning}</p>
+<p>Start your registry by issuing the following command in the directory containing
+the <code>docker-compose.yml</code> file:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-console" data-lang="console"><span class="line"><span class="cl"><span class="gp">$</span> docker compose up -d
+</span></span></code></pre></div><div class="flex align-center gdoc-page__anchorwrap">
+    <h2 id="considerations-for-air-gapped-registries"
+    >
+        Considerations for air-gapped registries
+    </h2>
+    <a data-clipboard-text="https://distribution.github.io/distribution/about/deploying/#considerations-for-air-gapped-registries" class="gdoc-page__anchor clip flex align-center" title="Anchor to: Considerations for air-gapped registries" aria-label="Anchor to: Considerations for air-gapped registries" href="index.html#considerations-for-air-gapped-registries">
+        <svg class="gdoc-icon gdoc_link"><use xlink:href="#gdoc_link"></use></svg>
+    </a>
+</div>
+<p>You can run a registry in an environment with no internet connectivity.
+However, if you rely on any images which are not local, you need to consider the
+following:</p>
+<ul>
+<li>
+<p>You may need to build your local registry&rsquo;s data volume on a connected
+host where you can run <code>docker pull</code> to get any images which are available
+remotely, and then migrate the registry&rsquo;s data volume to the air-gapped
+network.</p>
+</li>
+<li>
+<p>Certain images, such as the official Microsoft Windows base images, are not
+distributable. This means that when you push an image based on one of these
+images to your private registry, the non-distributable layers are <strong>not</strong>
+pushed, but are always fetched from their authorized location. This is fine
+for internet-connected hosts, but not in an air-gapped set-up.</p>
+<p>You can configure the Docker daemon to allow pushing non-distributable layers
+to private registries.
+<strong>This is only useful in air-gapped set-ups in the presence of
+non-distributable images, or in extremely bandwidth-limited situations.</strong>
+You are responsible for ensuring that you are in compliance with the terms of
+use for non-distributable layers.</p>
+<ol>
+<li>
+<p>Edit the <code>daemon.json</code> file, which is located in <code>/etc/docker/</code> on Linux
+hosts and <code>C:\ProgramData\docker\config\daemon.json</code> on Windows Server.
+Assuming the file was previously empty, add the following contents:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-json" data-lang="json"><span class="line"><span class="cl"><span class="p">{</span>
+</span></span><span class="line"><span class="cl">  <span class="nt">&#34;allow-nondistributable-artifacts&#34;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&#34;myregistrydomain.com:5000&#34;</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>The value is an array of registry addresses, separated by commas.</p>
+<p>Save and exit the file.</p>
+</li>
+<li>
+<p>Restart Docker.</p>
+</li>
+<li>
+<p>Restart the registry if it does not start automatically.</p>
+</li>
+<li>
+<p>When you push images to the registries in the list, their
+non-distributable layers are pushed to the registry.</p>
+</li>
+</ol>
+</li>
+</ul>
+
+
+
+
+
+<blockquote class="gdoc-hint warning">
+  <div class="gdoc-hint__title flex align-center"><i class="fa warning" title="Warning"></i></div>
+  <div class="gdoc-hint__text">Non-distributable artifacts typically have restrictions on
+how and where they can be distributed and shared. Only use this feature
+to push artifacts to private registries and ensure that you are in
+compliance with any terms that cover redistributing non-distributable
+artifacts.</div>
+</blockquote>
+
+<div class="flex align-center gdoc-page__anchorwrap">
+    <h2 id="next-steps"
+    >
+        Next steps
+    </h2>
+    <a data-clipboard-text="https://distribution.github.io/distribution/about/deploying/#next-steps" class="gdoc-page__anchor clip flex align-center" title="Anchor to: Next steps" aria-label="Anchor to: Next steps" href="index.html#next-steps">
+        <svg class="gdoc-icon gdoc_link"><use xlink:href="#gdoc_link"></use></svg>
+    </a>
+</div>
+<p>More specific and advanced information is available in the following sections:</p>
+<ul>
+<li><a href="../configuration/index.html">Configuration reference</a></li>
+<li><a href="../notifications/index.html">Working with notifications</a></li>
+<li><a href="../../recipes/index.html">Advanced &ldquo;recipes&rdquo;</a></li>
+<li><a href="../../spec/api/index.html">Registry API</a></li>
+<li><a href="../../storage-drivers/index.html">Storage driver model</a></li>
+<li><a href="../../spec/auth/token/index.html">Token authentication</a></li>
+</ul>
+
+  </article>
+
+
+
+          <div class="gdoc-page__footer flex flex-wrap justify-between">
+            
+
+
+
+
+
+
+
+
+  
+  
+
+  
+
+
+
+
+
+
+
+          </div>
+        </div>
+      </main>
+
+      <footer class="gdoc-footer">
+  <nav class="container flex">
+    <div>
+      <section class="flex flex-wrap align-center">
+        <span class="gdoc-footer__item gdoc-footer__item--row">
+          Built with <a href="https://gohugo.io/" class="gdoc-footer__link">Hugo</a> and <svg class="gdoc-icon gdoc_heart"><use xlink:href="#gdoc_heart"></use></svg>
+
+        </span>
+        
+          <span class="gdoc-footer__item gdoc-footer__item--row">
+            <a href="https://www.linuxfoundation.org/legal/trademark-usage" class="gdoc-footer__link">
+              Trademarks
+            </a>
+          </span>
+        
+        
+      </section>
+      
+        <section class="flex flex-wrap align-center">
+          <span class="gdoc-footer__item">
+            Content licensed under
+
+            <a href="https://creativecommons.org/licenses/by/4.0/" class="gdoc-footer__link no-wrap">CC BY 4.0</a>
+          </span>
+        </section>
+      
+    </div>
+    
+      <div class="flex flex-25 justify-end">
+        <span class="gdoc-footer__item text-right">
+          <a class="gdoc-footer__link fake-link" href="index.html#" aria-label="Back to top">
+            <svg class="gdoc-icon gdoc_keyboard_arrow_up">
+              <use xlink:href="#gdoc_keyboard_arrow_up"></use>
+            </svg>
+            <span class="hidden-mobile">Back to top</span>
+          </a>
+        </span>
+      </div>
+    
+  </nav>
+</footer>
+
+    </div>
+
+    
+  <script defer src="../../js/search-9719be99.bundle.min.js"></script>
+
+  </body>
+</html>

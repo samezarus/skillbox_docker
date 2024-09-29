@@ -1,0 +1,81 @@
+Мануалы:
+    https://docs.docker.com/manuals/
+
+    https://docs.docker.com/samples/
+
+    docker compose --help
+
+    docker compose <команда> --help
+
+Команды:
+
+    docker compose ls - список запущенных проектов(compose-ов) 
+
+Профили:
+
+    services -> <сервис> -> profiles - профилирование запуска сервисов
+
+        services
+            proxy-test:
+                image: nginx
+                ports:
+                    - "8080:80"
+
+            proxy-dev:
+                image: nginx
+                ports:
+                    - "8000:80"
+                profiles: 
+                    - dev
+            
+            proxy-prod:
+                image: nginx
+                ports:
+                    - "443:80"
+                profiles: 
+                    - prod
+        
+        docker compose --profiles dev up - запустит сервиc "proxy-dev" + "proxy-test"
+
+        docker compose --profiles dev --profiles prod up - запустит сервиc "proxy-dev" и сервис "proxy-prod" + "proxy-test"
+        
+        docker compose --profiles dev up proxy-prod - запустит сервиc "proxy-dev" и "proxy-prod" + "proxy-test"
+
+    services -> <сервис> -> evironment - переменные окружения передаваемые в сервис
+
+        map-синиакс:
+            var1: "abc"
+            var2: 100
+            var3:
+
+        array-синиакс:
+            - var1="abc"
+            - var2=100
+            - var3=
+
+        env-файл
+
+Сети:
+
+    services -> <сервис> -> networks
+
+        proxy-test:
+            image: nginx
+            ports:
+                - "8080:80"
+            networks:
+                - front-lan
+
+
+    networks
+
+        internal: true - compose не регулирует такую сеть. (при up не создаст; при down не удалит)
+
+        external: true - сеть изолировани от внешних взаимодействий
+
+        networks:
+            front-lan:       
+
+Тома:
+
+    
